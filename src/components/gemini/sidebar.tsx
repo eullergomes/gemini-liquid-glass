@@ -13,6 +13,7 @@ import { useEffect, useRef } from 'react'
 import { SidebarItem } from '@/components/gemini/sidebar-item'
 
 export interface SidebarProps {
+	onNewConversation?: () => void
 	onOpenChange: (open: boolean) => void
 	open: boolean
 }
@@ -21,26 +22,31 @@ const sidebarItems = [
 	{
 		description: 'Começar uma conversa limpa',
 		icon: Plus,
+		id: 'new-chat',
 		label: 'Nova conversa',
 	},
 	{
 		description: 'Descobrir assistentes e ideias',
 		icon: Sparkles,
+		id: 'gems',
 		label: 'Explorar Gems',
 	},
 	{
 		description: 'Retomar assuntos recentes',
 		icon: History,
+		id: 'history',
 		label: 'Histórico recente',
 	},
 	{
 		description: 'Preferências da experiência',
 		icon: Settings,
+		id: 'settings',
 		label: 'Configurações',
 	},
 	{
 		description: 'Dicas e suporte',
 		icon: HelpCircle,
+		id: 'help',
 		label: 'Ajuda',
 	},
 ]
@@ -54,7 +60,7 @@ const focusableSelector = [
 	'[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
-export function Sidebar({ onOpenChange, open }: SidebarProps) {
+export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null)
 	const panelRef = useRef<HTMLElement>(null)
 	const previousFocusRef = useRef<HTMLElement | null>(null)
@@ -133,6 +139,14 @@ export function Sidebar({ onOpenChange, open }: SidebarProps) {
 		onOpenChange(false)
 	}
 
+	const handleItemClick = (itemId: string) => {
+		if (itemId === 'new-chat') {
+			onNewConversation?.()
+		}
+
+		closeSidebar()
+	}
+
 	return (
 		<div
 			data-slot="sidebar-root"
@@ -203,11 +217,12 @@ export function Sidebar({ onOpenChange, open }: SidebarProps) {
 				>
 					{sidebarItems.map((item) => (
 						<SidebarItem
-							key={item.label}
+							key={item.id}
 							description={item.description}
 							icon={item.icon}
 							label={item.label}
 							tabIndex={open ? 0 : -1}
+							onClick={() => handleItemClick(item.id)}
 						/>
 					))}
 				</nav>

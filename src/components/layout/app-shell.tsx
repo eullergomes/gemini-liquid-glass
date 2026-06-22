@@ -1,10 +1,12 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { ChatComposer } from '@/components/chat/chat-composer'
+import { ChatThread } from '@/components/chat/chat-thread'
 import { GeminiHeader } from '@/components/gemini/gemini-header'
 import { PromptGrid, type PromptSuggestion } from '@/components/gemini/prompt-grid'
 import { Sidebar } from '@/components/gemini/sidebar'
+import type { ChatMessage } from '@/types/chat'
 
 const promptSuggestions: PromptSuggestion[] = [
 	{
@@ -30,22 +32,94 @@ const promptSuggestions: PromptSuggestion[] = [
 ]
 
 export function AppShell() {
+	const [isLoading, setIsLoading] = useState(false)
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+	const [messages, setMessages] = useState<ChatMessage[]>([])
+	const responseTimeoutRef = useRef<number | null>(null)
+	const hasMessages = messages.length > 0
 
 	const openSidebar = useCallback(() => {
 		setIsSidebarOpen(true)
 	}, [])
 
+	const clearResponseTimeout = useCallback(() => {
+		if (responseTimeoutRef.current !== null) {
+			window.clearTimeout(responseTimeoutRef.current)
+			responseTimeoutRef.current = null
+		}
+	}, [])
+
+	const createMessageId = useCallback((prefix: string) => {
+		if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+			return `${prefix}-${crypto.randomUUID()}`
+		}
+
+		return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
+	}, [])
+
+	const createMockResponse = useCallback((prompt: string) => {
+		return [
+			'Boa pergunta. Ainda estou no modo de resposta mockada, sem chamar uma API real.',
+			`Para "${prompt}", eu começaria organizando o contexto, separando o objetivo principal e listando os próximos passos mais úteis.`,
+			'No próximo bloco, essa resposta poderá vir de uma integração server-side com IA.',
+		].join('\n\n')
+	}, [])
+
+	const submitMessage = useCallback((content: string) => {
+		const trimmedContent = content.trim()
+
+		if (!trimmedContent || isLoading) {
+			return
+		}
+
+		clearResponseTimeout()
+
+		const userMessage: ChatMessage = {
+			content: trimmedContent,
+			createdAt: new Date(),
+			id: createMessageId('user'),
+			role: 'user',
+		}
+
+		setMessages((currentMessages) => [...currentMessages, userMessage])
+		setIsLoading(true)
+
+		responseTimeoutRef.current = window.setTimeout(() => {
+			const assistantMessage: ChatMessage = {
+				content: createMockResponse(trimmedContent),
+				createdAt: new Date(),
+				id: createMessageId('assistant'),
+				role: 'assistant',
+			}
+
+			setMessages((currentMessages) => [...currentMessages, assistantMessage])
+			setIsLoading(false)
+			responseTimeoutRef.current = null
+		}, 900)
+	}, [clearResponseTimeout, createMessageId, createMockResponse, isLoading])
+
+	const clearConversation = useCallback(() => {
+		clearResponseTimeout()
+		setMessages([])
+		setIsLoading(false)
+		setIsSidebarOpen(false)
+	}, [clearResponseTimeout])
+
+	const handleSuggestionSelect = useCallback((suggestion: PromptSuggestion) => {
+		submitMessage(suggestion.title)
+	}, [submitMessage])
+
 	return (
 		<div
 			data-slot="app-shell"
-			className="liquid-background relative min-h-dvh overflow-hidden text-foreground"
+			className="liquid-background relative min-h-dvh overflow-x-hidden text-foreground"
 		>
 			<div
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-white/45 to-transparent dark:from-white/5"
 			/>
 			<Sidebar
+				onNewConversation={clearConversation}
 				open={isSidebarOpen}
 				onOpenChange={setIsSidebarOpen}
 			/>
@@ -57,33 +131,46 @@ export function AppShell() {
 				data-slot="app-main"
 				className="relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-40 pt-24"
 			>
-				<section
-					aria-labelledby="empty-state-title"
-					className="flex flex-1 flex-col justify-center gap-8"
-				>
-					<div className="space-y-3">
-						<p className="text-sm font-medium text-muted-foreground">
-							Assistente Gemini
-						</p>
-						<h1
-							id="empty-state-title"
-							className="text-balance text-5xl font-semibold leading-[1.05] tracking-normal text-foreground"
-						>
-							<span className="block bg-gradient-to-r from-gemini-blue via-gemini-violet to-gemini-rose bg-clip-text text-transparent">
-								Olá, eulle
-							</span>
-							<span className="block text-foreground-subtle">
-								Como posso ajudar hoje?
-							</span>
-						</h1>
-						<p className="max-w-xl text-pretty text-base leading-7 text-muted-foreground">
-							Converse, explore ideias e organize respostas em uma experiência leve e fluida.
-						</p>
-					</div>
-					<PromptGrid suggestions={promptSuggestions} />
-				</section>
+				{hasMessages ? (
+					<ChatThread
+						isLoading={isLoading}
+						messages={messages}
+					/>
+				) : (
+					<section
+						aria-labelledby="empty-state-title"
+						className="flex flex-1 flex-col justify-center gap-8"
+					>
+						<div className="space-y-3">
+							<p className="text-sm font-medium text-muted-foreground">
+								Assistente Gemini
+							</p>
+							<h1
+								id="empty-state-title"
+								className="text-balance text-5xl font-semibold leading-[1.05] tracking-normal text-foreground"
+							>
+								<span className="block bg-gradient-to-r from-gemini-blue via-gemini-violet to-gemini-rose bg-clip-text text-transparent">
+									Olá, eulle
+								</span>
+								<span className="block text-foreground-subtle">
+									Como posso ajudar hoje?
+								</span>
+							</h1>
+							<p className="max-w-xl text-pretty text-base leading-7 text-muted-foreground">
+								Converse, explore ideias e organize respostas em uma experiência leve e fluida.
+							</p>
+						</div>
+						<PromptGrid
+							suggestions={promptSuggestions}
+							onSuggestionSelect={handleSuggestionSelect}
+						/>
+					</section>
+				)}
 			</main>
-			<ChatComposer />
+			<ChatComposer
+				disabled={isLoading}
+				onSubmit={submitMessage}
+			/>
 		</div>
 	)
 }

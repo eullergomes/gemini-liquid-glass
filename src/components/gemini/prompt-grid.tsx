@@ -8,10 +8,15 @@ export interface PromptSuggestion {
 }
 
 export interface PromptGridProps extends ComponentProps<'div'> {
+	onSuggestionSelect?: (suggestion: PromptSuggestion) => void
 	suggestions: PromptSuggestion[]
 }
 
-export function PromptGrid({ suggestions, ...props }: PromptGridProps) {
+export function PromptGrid({
+	onSuggestionSelect,
+	suggestions,
+	...props
+}: PromptGridProps) {
 	return (
 		<div
 			data-slot="prompt-grid"
@@ -24,6 +29,7 @@ export function PromptGrid({ suggestions, ...props }: PromptGridProps) {
 					title={suggestion.title}
 					description={suggestion.description}
 					tone={suggestion.tone}
+					onClick={() => onSuggestionSelect?.(suggestion)}
 				/>
 			))}
 		</div>

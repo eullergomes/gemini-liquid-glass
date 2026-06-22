@@ -1,6 +1,10 @@
+'use client'
+
+import { useCallback, useState } from 'react'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { GeminiHeader } from '@/components/gemini/gemini-header'
 import { PromptGrid, type PromptSuggestion } from '@/components/gemini/prompt-grid'
+import { Sidebar } from '@/components/gemini/sidebar'
 
 const promptSuggestions: PromptSuggestion[] = [
 	{
@@ -26,6 +30,12 @@ const promptSuggestions: PromptSuggestion[] = [
 ]
 
 export function AppShell() {
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+	const openSidebar = useCallback(() => {
+		setIsSidebarOpen(true)
+	}, [])
+
 	return (
 		<div
 			data-slot="app-shell"
@@ -35,7 +45,14 @@ export function AppShell() {
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-white/45 to-transparent dark:from-white/5"
 			/>
-			<GeminiHeader />
+			<Sidebar
+				open={isSidebarOpen}
+				onOpenChange={setIsSidebarOpen}
+			/>
+			<GeminiHeader
+				isMenuOpen={isSidebarOpen}
+				onMenuOpen={openSidebar}
+			/>
 			<main
 				data-slot="app-main"
 				className="relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-40 pt-24"

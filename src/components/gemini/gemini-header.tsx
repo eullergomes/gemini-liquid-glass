@@ -3,7 +3,12 @@ import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
 
-export function GeminiHeader() {
+export interface GeminiHeaderProps {
+	isMenuOpen: boolean
+	onMenuOpen: () => void
+}
+
+export function GeminiHeader({ isMenuOpen, onMenuOpen }: GeminiHeaderProps) {
 	return (
 		<header
 			data-slot="gemini-header"
@@ -14,6 +19,10 @@ export function GeminiHeader() {
 					aria-label="Abrir menu"
 					variant="ghost"
 					size="md"
+					aria-controls="gemini-sidebar"
+					aria-expanded={isMenuOpen}
+					aria-haspopup="dialog"
+					onClick={onMenuOpen}
 				>
 					<Menu aria-hidden="true" />
 				</IconButton>

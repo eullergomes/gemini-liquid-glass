@@ -51,16 +51,20 @@ export function Avatar({
 	children,
 	className,
 	name,
+	role,
 	size,
 	src,
 	variant,
 	...props
 }: AvatarProps) {
 	const fallback = children ?? getInitials(name)
+	const ariaLabel = props['aria-label'] ?? alt ?? name
 
 	return (
 		<div
 			data-slot="avatar"
+			role={role ?? (ariaLabel ? 'img' : undefined)}
+			aria-label={ariaLabel}
 			className={twMerge(avatarVariants({ size, variant }), className)}
 			{...props}
 		>
@@ -76,7 +80,7 @@ export function Avatar({
 			) : (
 				<span
 					data-slot="avatar-fallback"
-					aria-hidden={alt || name ? undefined : true}
+					aria-hidden="true"
 				>
 					{fallback}
 				</span>

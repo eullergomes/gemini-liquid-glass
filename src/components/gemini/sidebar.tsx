@@ -107,7 +107,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 			const panel = panelRef.current
 			const focusableElements = Array.from(
 				panel?.querySelectorAll<HTMLElement>(focusableSelector) ?? [],
-			).filter((element) => element.offsetParent !== null)
+			).filter((element) => element.getClientRects().length > 0)
 
 			if (focusableElements.length === 0) {
 				event.preventDefault()

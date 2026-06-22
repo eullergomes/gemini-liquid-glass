@@ -1,12 +1,12 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { GeminiHeader } from '@/components/gemini/gemini-header'
 import { PromptGrid, type PromptSuggestion } from '@/components/gemini/prompt-grid'
 import { Sidebar } from '@/components/gemini/sidebar'
-import type { ChatMessage } from '@/types/chat'
+import type { ChatApiMessage, ChatMessage } from '@/types/chat'
 
 const promptSuggestions: PromptSuggestion[] = [
 	{
@@ -31,38 +31,138 @@ const promptSuggestions: PromptSuggestion[] = [
 	},
 ]
 
+const genericErrorMessage = 'Não consegui responder agora. Confira a configuração da API e tente novamente.'
+const friendlyErrorPrefixes = [
+	'A chave',
+	'A resposta',
+	'Envie',
+	'Não foi',
+]
+
+function createMessageId(prefix: string) {
+	if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+		return `${prefix}-${crypto.randomUUID()}`
+	}
+
+	return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
+function toApiMessages(messages: ChatMessage[]): ChatApiMessage[] {
+	return messages.map((message) => ({
+		content: message.content,
+		role: message.role,
+	}))
+}
+
+function getFriendlyErrorMessage(error: unknown) {
+	if (!(error instanceof Error)) {
+		return genericErrorMessage
+	}
+
+	return friendlyErrorPrefixes.some((prefix) => error.message.startsWith(prefix))
+		? error.message
+		: genericErrorMessage
+}
+
+async function readErrorMessage(response: Response) {
+	try {
+		const payload = await response.json() as { error?: unknown }
+
+		if (typeof payload.error === 'string' && payload.error.trim()) {
+			return payload.error
+		}
+	} catch {
+		return genericErrorMessage
+	}
+
+	return genericErrorMessage
+}
+
 export function AppShell() {
+	const [error, setError] = useState<string | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 	const [messages, setMessages] = useState<ChatMessage[]>([])
-	const responseTimeoutRef = useRef<number | null>(null)
 	const hasMessages = messages.length > 0
 
 	const openSidebar = useCallback(() => {
 		setIsSidebarOpen(true)
 	}, [])
 
-	const clearResponseTimeout = useCallback(() => {
-		if (responseTimeoutRef.current !== null) {
-			window.clearTimeout(responseTimeoutRef.current)
-			responseTimeoutRef.current = null
+	const requestAssistantResponse = useCallback(async (conversationMessages: ChatMessage[]) => {
+		setError(null)
+		setIsLoading(true)
+
+		let assistantMessageId: string | null = null
+
+		try {
+			const response = await fetch('/api/chat', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					messages: toApiMessages(conversationMessages),
+				}),
+			})
+
+			if (!response.ok) {
+				throw new Error(await readErrorMessage(response))
+			}
+
+			if (!response.body) {
+				throw new Error('A resposta da IA veio vazia.')
+			}
+
+			assistantMessageId = createMessageId('assistant')
+
+			const assistantMessage: ChatMessage = {
+				content: '',
+				createdAt: new Date(),
+				id: assistantMessageId,
+				role: 'assistant',
+			}
+
+			setMessages([...conversationMessages, assistantMessage])
+
+			const reader = response.body.getReader()
+			const decoder = new TextDecoder()
+			let assistantContent = ''
+
+			while (true) {
+				const { done, value } = await reader.read()
+
+				if (done) {
+					break
+				}
+
+				assistantContent += decoder.decode(value, { stream: true })
+
+				setMessages((currentMessages) => currentMessages.map((message) => (
+					message.id === assistantMessageId
+						? { ...message, content: assistantContent }
+						: message
+				)))
+			}
+
+			assistantContent += decoder.decode()
+
+			setMessages((currentMessages) => currentMessages.map((message) => (
+				message.id === assistantMessageId
+					? { ...message, content: assistantContent.trim() || 'Não recebi conteúdo da IA.' }
+					: message
+			)))
+		} catch (caughtError) {
+			if (assistantMessageId) {
+				setMessages((currentMessages) => currentMessages.filter((message) => (
+					message.id !== assistantMessageId
+				)))
+			}
+
+			setError(getFriendlyErrorMessage(caughtError))
+		} finally {
+			setIsLoading(false)
 		}
-	}, [])
-
-	const createMessageId = useCallback((prefix: string) => {
-		if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-			return `${prefix}-${crypto.randomUUID()}`
-		}
-
-		return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
-	}, [])
-
-	const createMockResponse = useCallback((prompt: string) => {
-		return [
-			'Boa pergunta. Ainda estou no modo de resposta mockada, sem chamar uma API real.',
-			`Para "${prompt}", eu começaria organizando o contexto, separando o objetivo principal e listando os próximos passos mais úteis.`,
-			'No próximo bloco, essa resposta poderá vir de uma integração server-side com IA.',
-		].join('\n\n')
 	}, [])
 
 	const submitMessage = useCallback((content: string) => {
@@ -72,8 +172,6 @@ export function AppShell() {
 			return
 		}
 
-		clearResponseTimeout()
-
 		const userMessage: ChatMessage = {
 			content: trimmedContent,
 			createdAt: new Date(),
@@ -81,29 +179,34 @@ export function AppShell() {
 			role: 'user',
 		}
 
-		setMessages((currentMessages) => [...currentMessages, userMessage])
-		setIsLoading(true)
+		const nextMessages = [...messages, userMessage]
 
-		responseTimeoutRef.current = window.setTimeout(() => {
-			const assistantMessage: ChatMessage = {
-				content: createMockResponse(trimmedContent),
-				createdAt: new Date(),
-				id: createMessageId('assistant'),
-				role: 'assistant',
-			}
+		setMessages(nextMessages)
+		void requestAssistantResponse(nextMessages)
+	}, [isLoading, messages, requestAssistantResponse])
 
-			setMessages((currentMessages) => [...currentMessages, assistantMessage])
-			setIsLoading(false)
-			responseTimeoutRef.current = null
-		}, 900)
-	}, [clearResponseTimeout, createMessageId, createMockResponse, isLoading])
+	const retryLastMessage = useCallback(() => {
+		if (isLoading) {
+			return
+		}
+
+		const lastUserMessageIndex = messages.findLastIndex((message) => message.role === 'user')
+
+		if (lastUserMessageIndex === -1) {
+			return
+		}
+
+		const retryMessages = messages.slice(0, lastUserMessageIndex + 1)
+		setMessages(retryMessages)
+		void requestAssistantResponse(retryMessages)
+	}, [isLoading, messages, requestAssistantResponse])
 
 	const clearConversation = useCallback(() => {
-		clearResponseTimeout()
+		setError(null)
 		setMessages([])
 		setIsLoading(false)
 		setIsSidebarOpen(false)
-	}, [clearResponseTimeout])
+	}, [])
 
 	const handleSuggestionSelect = useCallback((suggestion: PromptSuggestion) => {
 		submitMessage(suggestion.title)
@@ -133,8 +236,10 @@ export function AppShell() {
 			>
 				{hasMessages ? (
 					<ChatThread
+						error={error}
 						isLoading={isLoading}
 						messages={messages}
+						onRetry={retryLastMessage}
 					/>
 				) : (
 					<section

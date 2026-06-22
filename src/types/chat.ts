@@ -6,3 +6,8 @@ export interface ChatMessage {
 	id: string
 	role: ChatMessageRole
 }
+
+export interface ChatApiMessage {
+	content: string
+	role: ChatMessageRole
+}

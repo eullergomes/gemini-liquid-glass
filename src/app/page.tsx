@@ -1,7 +1,5 @@
-const Home = () => {
-  return ( 
-    <div className='bg-zinc-50 dark:bg-black'>Home</div>
-   );
+import { AppShell } from '@/components/layout/app-shell'
+
+export default function Home() {
+	return <AppShell />
 }
- 
-export default Home;

@@ -26,6 +26,7 @@
 	--glass-highlight: oklch(100% 0 0 / 74%);
 	--glass-shadow: 0 24px 80px oklch(45% 0.07 260 / 14%);
 	--glass-shadow-soft: 0 14px 40px oklch(45% 0.06 260 / 10%);
+	--glass-shadow-focus: 0 18px 60px oklch(58% 0.16 258 / 20%);
 	--radius-sm: 0.5rem;
 	--radius-md: 0.875rem;
 	--radius-lg: 1.25rem;
@@ -63,6 +64,7 @@
 	--radius-xl: var(--radius-xl);
 	--shadow-glass: var(--glass-shadow);
 	--shadow-glass-soft: var(--glass-shadow-soft);
+	--shadow-glass-focus: var(--glass-shadow-focus);
 	--font-sans: Arial, Helvetica, sans-serif;
 }
 
@@ -87,6 +89,7 @@
 		--glass-highlight: oklch(100% 0 0 / 18%);
 		--glass-shadow: 0 24px 80px oklch(0% 0 0 / 34%);
 		--glass-shadow-soft: 0 14px 44px oklch(0% 0 0 / 28%);
+		--glass-shadow-focus: 0 18px 60px oklch(69% 0.17 252 / 18%);
 		--ambient-aura:
 			radial-gradient(circle at 10% 18%, oklch(56% 0.18 252 / 22%), transparent 34rem),
 			radial-gradient(circle at 88% 12%, oklch(57% 0.18 316 / 18%), transparent 28rem),
@@ -141,9 +144,23 @@ select {
 
 @layer utilities {
 	.liquid-background {
+		position: relative;
 		background:
 			var(--ambient-aura),
 			linear-gradient(145deg, var(--background) 0%, color-mix(in oklch, var(--background) 86%, var(--gemini-blue)) 100%);
+	}
+
+	.liquid-background::before {
+		content: "";
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		background-image:
+			linear-gradient(115deg, oklch(100% 0 0 / 14%) 0 1px, transparent 1px 11px),
+			radial-gradient(circle at 35% 20%, oklch(100% 0 0 / 18%), transparent 18rem);
+		opacity: 0.24;
+		pointer-events: none;
+		mask-image: linear-gradient(to bottom, black, transparent 82%);
 	}
 
 	.glass-panel {
@@ -157,7 +174,21 @@ select {
 		-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.28);
 	}
 
+	.glass-panel::after,
+	.glass-elevated::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background:
+			linear-gradient(160deg, oklch(100% 0 0 / 20%), transparent 32%),
+			radial-gradient(circle at 85% 15%, oklch(100% 0 0 / 18%), transparent 18%);
+		opacity: 0.55;
+		pointer-events: none;
+	}
+
 	.glass-elevated {
+		position: relative;
 		border: 1px solid var(--glass-border);
 		background:
 			linear-gradient(135deg, var(--glass-highlight), transparent 34%),
@@ -215,6 +246,58 @@ select {
 	.liquid-content {
 		position: relative;
 		z-index: 1;
+	}
+
+	.animate-liquid-enter {
+		animation: liquid-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+		animation-delay: var(--enter-delay, 0ms);
+	}
+
+	.animate-liquid-pop {
+		animation: liquid-pop 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	}
+
+	.typing-dot {
+		animation: typing-wave 900ms ease-in-out infinite;
+		animation-delay: var(--dot-delay, 0ms);
+	}
+}
+
+@keyframes liquid-enter {
+	from {
+		opacity: 0;
+		transform: translateY(14px) scale(0.98);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes liquid-pop {
+	from {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes typing-wave {
+	0%,
+	70%,
+	100% {
+		opacity: 0.36;
+		transform: translateY(0) scale(0.92);
+	}
+
+	30% {
+		opacity: 1;
+		transform: translateY(-3px) scale(1);
 	}
 }
 

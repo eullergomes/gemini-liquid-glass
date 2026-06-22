@@ -5,8 +5,8 @@ import type { LucideIcon } from 'lucide-react'
 
 export const sidebarItemVariants = tv({
 	base: [
-		'flex w-full cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-left transition-colors',
-		'text-foreground hover:border-border hover:bg-surface-raised',
+		'group flex w-full cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-left transition-all duration-200',
+		'text-foreground active:scale-[0.99] hover:border-border hover:bg-surface-raised hover:shadow-glass-soft',
 		'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 		'disabled:pointer-events-none disabled:opacity-50',
 	],
@@ -47,7 +47,7 @@ export function SidebarItem({
 		>
 			<span
 				data-slot="sidebar-item-icon"
-				className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+				className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-primary-foreground"
 			>
 				<Icon
 					aria-hidden="true"

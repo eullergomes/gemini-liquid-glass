@@ -10,7 +10,7 @@ export function ChatError({ message, onRetry }: ChatErrorProps) {
 	return (
 		<div
 			data-slot="chat-error"
-			className="glass-panel glass-inner-glow rounded-xl p-4 text-sm text-foreground"
+			className="animate-liquid-pop glass-panel glass-inner-glow rounded-xl border-destructive/30 p-4 text-sm text-foreground"
 			role="alert"
 		>
 			<p className="leading-6 text-foreground-subtle">{message}</p>

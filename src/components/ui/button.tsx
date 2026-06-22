@@ -4,8 +4,8 @@ import type { ComponentProps } from 'react'
 
 export const buttonVariants = tv({
 	base: [
-		'inline-flex cursor-pointer items-center justify-center rounded-lg border font-medium transition-colors',
-		'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+		'inline-flex cursor-pointer items-center justify-center rounded-lg border font-medium transition-all duration-200',
+		'active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 		'disabled:pointer-events-none disabled:opacity-50 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 	],
 	variants: {

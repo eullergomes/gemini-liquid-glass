@@ -13,7 +13,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 		<article
 			data-slot="chat-message"
 			data-role={message.role}
-			className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
+			className={`animate-liquid-enter flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
 		>
 			{isUser ? null : (
 				<span
@@ -28,10 +28,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
 			)}
 			<div
 				data-slot="message-bubble"
-				className={`max-w-[82%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm leading-6 shadow-glass-soft ${
+				className={`max-w-[82%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm leading-6 shadow-glass-soft transition-shadow duration-300 ${
 					isUser
 						? 'bg-primary text-primary-foreground'
-						: 'glass-panel glass-inner-glow text-foreground'
+						: 'glass-panel glass-inner-glow text-foreground hover:shadow-glass-focus'
 				}`}
 			>
 				{message.content}

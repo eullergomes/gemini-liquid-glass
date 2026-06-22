@@ -39,7 +39,7 @@ export function ChatComposer({ disabled = false, onSubmit }: ChatComposerProps) 
 		>
 			<form
 				data-slot="chat-composer"
-				className="glass-elevated glass-inner-glow pointer-events-auto mx-auto max-w-4xl rounded-xl p-2"
+				className="glass-elevated glass-inner-glow pointer-events-auto mx-auto max-w-4xl rounded-xl p-2 transition-all duration-300 focus-within:-translate-y-0.5 focus-within:shadow-glass-focus"
 				onSubmit={handleSubmit}
 			>
 				<label
@@ -55,7 +55,7 @@ export function ChatComposer({ disabled = false, onSubmit }: ChatComposerProps) 
 					rows={1}
 					placeholder="Pergunte qualquer coisa"
 					value={message}
-					className="max-h-36 min-h-11 border-transparent bg-surface-raised/70 px-3 py-3 shadow-none"
+					className="max-h-36 min-h-11 border-transparent bg-surface-raised/70 px-3 py-3 shadow-none transition-colors duration-200 focus-visible:ring-0 focus-visible:ring-offset-0"
 					disabled={disabled}
 					onChange={(event) => setMessage(event.target.value)}
 					onKeyDown={handleKeyDown}
@@ -93,6 +93,7 @@ export function ChatComposer({ disabled = false, onSubmit }: ChatComposerProps) 
 							variant="primary"
 							size="sm"
 							type="submit"
+							className={canSubmit ? 'shadow-glass-soft' : undefined}
 							disabled={!canSubmit}
 						>
 							<SendHorizontal aria-hidden="true" />

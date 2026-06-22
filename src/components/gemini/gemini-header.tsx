@@ -33,7 +33,7 @@ export function GeminiHeader({ isMenuOpen, onMenuOpen }: GeminiHeaderProps) {
 					<Button
 						variant="ghost"
 						size="sm"
-						className="-ml-2 h-7 rounded-full px-2 text-xs text-muted-foreground"
+						className="-ml-2 h-7 rounded-full px-2 text-xs text-muted-foreground hover:bg-surface-raised"
 					>
 						<span>1.5 Flash</span>
 						<ChevronDown aria-hidden="true" />

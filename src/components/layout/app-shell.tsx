@@ -235,16 +235,18 @@ export function AppShell() {
 				className="relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-40 pt-24"
 			>
 				{hasMessages ? (
-					<ChatThread
-						error={error}
-						isLoading={isLoading}
-						messages={messages}
-						onRetry={retryLastMessage}
-					/>
+					<div className="animate-liquid-enter flex flex-1 flex-col">
+						<ChatThread
+							error={error}
+							isLoading={isLoading}
+							messages={messages}
+							onRetry={retryLastMessage}
+						/>
+					</div>
 				) : (
 					<section
 						aria-labelledby="empty-state-title"
-						className="flex flex-1 flex-col justify-center gap-8"
+						className="animate-liquid-enter flex flex-1 flex-col justify-center gap-8"
 					>
 						<div className="space-y-3">
 							<p className="text-sm font-medium text-muted-foreground">

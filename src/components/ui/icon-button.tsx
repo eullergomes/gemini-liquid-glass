@@ -4,16 +4,16 @@ import type { ComponentProps } from 'react'
 
 export const iconButtonVariants = tv({
 	base: [
-		'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors',
-		'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+		'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-200',
+		'active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 		'disabled:pointer-events-none disabled:opacity-50 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 	],
 	variants: {
 		variant: {
 			primary: 'border-primary bg-primary text-primary-foreground hover:bg-primary-hover',
 			secondary: 'border-border bg-secondary text-foreground hover:bg-muted',
-			ghost: 'border-transparent bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
-			glass: 'glass-panel glass-inner-glow border-border text-foreground hover:bg-surface-raised',
+			ghost: 'border-transparent bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-glass-soft',
+			glass: 'glass-panel glass-inner-glow border-border text-foreground hover:bg-surface-raised hover:shadow-glass-focus',
 		},
 		size: {
 			sm: 'size-8 [&_svg]:size-3.5',

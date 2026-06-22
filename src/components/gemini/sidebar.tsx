@@ -157,7 +157,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 				type="button"
 				aria-label="Fechar menu"
 				tabIndex={open ? 0 : -1}
-				className={`absolute inset-0 cursor-default bg-foreground/18 backdrop-blur-sm transition-opacity motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
+				className={`absolute inset-0 cursor-default bg-foreground/20 backdrop-blur-md transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
 				data-open={open ? '' : undefined}
 				onClick={closeSidebar}
 			/>
@@ -170,7 +170,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 				aria-labelledby="gemini-sidebar-title"
 				data-slot="sidebar"
 				data-open={open ? '' : undefined}
-				className="glass-elevated glass-inner-glow fixed inset-y-0 flex w-[min(20rem,calc(100vw-2rem))] flex-col rounded-r-xl border-y-0 border-l-0 p-3 shadow-glass transition-[left] duration-300 motion-reduce:transition-none"
+				className="glass-elevated glass-inner-glow fixed inset-y-0 flex w-[min(20rem,calc(100vw-2rem))] flex-col rounded-r-xl border-y-0 border-l-0 p-3 shadow-glass transition-[left] duration-300 ease-out motion-reduce:transition-none"
 				style={{
 					left: open ? '0' : '-20rem',
 					transform: 'none',
@@ -179,7 +179,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 			>
 				<div className="flex items-center justify-between gap-3 px-1 pb-5 pt-2">
 					<div className="flex min-w-0 items-center gap-3">
-						<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+						<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glass-soft">
 							<Compass
 								aria-hidden="true"
 								className="size-5"
@@ -202,7 +202,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 						ref={closeButtonRef}
 						aria-label="Fechar menu"
 						tabIndex={open ? 0 : -1}
-						className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-transparent text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+						className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-transparent text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 						onClick={closeSidebar}
 					>
 						<X
@@ -226,7 +226,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 						/>
 					))}
 				</nav>
-				<div className="rounded-lg border border-border bg-surface/70 p-3 text-xs leading-5 text-muted-foreground">
+				<div className="rounded-lg border border-border bg-surface/70 p-3 text-xs leading-5 text-muted-foreground shadow-glass-soft">
 					Respostas mais úteis começam com contexto claro e perguntas específicas.
 				</div>
 			</aside>

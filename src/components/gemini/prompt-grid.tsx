@@ -1,5 +1,5 @@
 import { PromptCard } from '@/components/gemini/prompt-card'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, CSSProperties } from 'react'
 
 export interface PromptSuggestion {
 	description: string
@@ -10,6 +10,10 @@ export interface PromptSuggestion {
 export interface PromptGridProps extends ComponentProps<'div'> {
 	onSuggestionSelect?: (suggestion: PromptSuggestion) => void
 	suggestions: PromptSuggestion[]
+}
+
+type PromptCardStyle = CSSProperties & {
+	'--enter-delay': string
 }
 
 export function PromptGrid({
@@ -23,12 +27,13 @@ export function PromptGrid({
 			className="grid grid-cols-1 gap-3 min-[560px]:grid-cols-2"
 			{...props}
 		>
-			{suggestions.map((suggestion) => (
+			{suggestions.map((suggestion, index) => (
 				<PromptCard
 					key={suggestion.title}
 					title={suggestion.title}
 					description={suggestion.description}
 					tone={suggestion.tone}
+					style={{ '--enter-delay': `${index * 55}ms` } as PromptCardStyle}
 					onClick={() => onSuggestionSelect?.(suggestion)}
 				/>
 			))}

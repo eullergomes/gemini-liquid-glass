@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { GeminiHeader } from '@/components/gemini/gemini-header'
@@ -59,10 +60,14 @@ async function readErrorMessage(response: Response) {
 
 export function AppShell() {
 	const [error, setError] = useState<string | null>(null)
+	const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true)
 	const [isLoading, setIsLoading] = useState(false)
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const hasMessages = messages.length > 0
+	const shellStyle = {
+		'--sidebar-offset': isDesktopSidebarOpen ? '22.5rem' : '4rem',
+	} as CSSProperties
 
 	const openSidebar = useCallback(() => {
 		setIsSidebarOpen(true)
@@ -192,8 +197,11 @@ export function AppShell() {
 			data-slot="app-shell"
 			data-state={hasMessages ? 'chat' : 'empty'}
 			className="liquid-background relative min-h-dvh overflow-x-hidden bg-background text-foreground"
+			style={shellStyle}
 		>
 			<Sidebar
+				desktopOpen={isDesktopSidebarOpen}
+				onDesktopOpenChange={setIsDesktopSidebarOpen}
 				onNewConversation={clearConversation}
 				open={isSidebarOpen}
 				onOpenChange={setIsSidebarOpen}
@@ -207,8 +215,8 @@ export function AppShell() {
 				data-slot="app-main"
 				className={
 					hasMessages
-						? 'relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-36 pt-20 desktop:max-w-5xl desktop:pl-28 desktop:pr-12 desktop:pt-24'
-						: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 desktop:pl-16 desktop:pb-14 desktop:pt-24'
+						? 'relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-36 pt-20 desktop:ml-[var(--sidebar-offset)] desktop:w-[calc(100%_-_var(--sidebar-offset))] desktop:max-w-none desktop:px-12 desktop:pt-20'
+						: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 desktop:ml-[var(--sidebar-offset)] desktop:w-[calc(100%_-_var(--sidebar-offset))] desktop:pb-14 desktop:pt-20'
 				}
 			>
 				{hasMessages ? (
@@ -253,9 +261,9 @@ export function AppShell() {
 					onSubmit={submitMessage}
 				/>
 			) : null}
-			<p className="fixed inset-x-0 bottom-3 z-10 hidden text-center text-xs font-medium text-muted-foreground desktop:block">
+			{/* <p className="fixed bottom-3 left-[var(--sidebar-offset)] right-0 z-10 hidden text-center text-xs font-medium text-muted-foreground desktop:block">
 				Sujeito aos Termos do Google e à Política de Privacidade do Google. O Gemini é uma IA e pode cometer erros.
-			</p>
+			</p> */}
 		</div>
 	)
 }

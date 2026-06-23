@@ -23,13 +23,13 @@ export function GeminiHeader({
 	return (
 		<header
 			data-slot="gemini-header"
-			className="fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between px-4 text-foreground desktop:h-20 desktop:pl-20 desktop:pr-4"
+			className="fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between px-4 text-foreground desktop:hidden"
 		>
 			<div className="flex min-w-0 items-center gap-3 desktop:hidden">
 				<IconButton
 					aria-label="Abrir menu"
 					variant="ghost"
-					size="md"
+					size="lg"
 					className="text-foreground hover:bg-white/10 hover:text-foreground"
 					aria-controls="gemini-sidebar"
 					aria-expanded={isMenuOpen}

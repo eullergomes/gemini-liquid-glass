@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { twMerge } from 'tailwind-merge'
 import type { ComponentProps } from 'react'
 
@@ -6,7 +7,7 @@ export interface GeminiMarkProps extends ComponentProps<'span'> {
 }
 
 const markSizes = {
-	sm: 'size-5',
+	sm: 'size-6',
 	md: 'size-8',
 	lg: 'size-11',
 }
@@ -26,10 +27,15 @@ export function GeminiMark({
 			className={twMerge('relative inline-flex shrink-0 items-center justify-center', markSizes[size], className)}
 			{...props}
 		>
-			<span className="absolute inset-[18%] rotate-45 rounded-[35%_65%_35%_65%] bg-gradient-to-br from-gemini-blue via-gemini-cyan to-gemini-violet blur-[0.5px]" />
-			<span className="absolute inset-x-[12%] inset-y-[42%] rounded-full bg-gradient-to-r from-transparent via-gemini-rose to-transparent" />
-			<span className="absolute inset-y-[12%] inset-x-[42%] rounded-full bg-gradient-to-b from-transparent via-gemini-cyan to-transparent" />
-			<span className="absolute inset-[28%] rounded-full bg-white/80 blur-[2px]" />
+			<Image
+				src="/assets/images/gemini-liquid-glass-logo.webp"
+				alt=""
+				aria-hidden="true"
+				width={96}
+				height={96}
+				sizes="44px"
+				className="size-full object-contain drop-shadow-[0_0_12px_rgba(64,156,255,0.45)]"
+			/>
 		</span>
 	)
 }

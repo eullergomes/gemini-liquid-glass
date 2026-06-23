@@ -1,56 +1,56 @@
 'use client'
 
 import {
-	HelpCircle,
-	History,
-	MessageSquarePlus,
+	ChevronDown,
+	Clapperboard,
+	Image,
+	Library,
+	MoreVertical,
+	PanelLeftClose,
+	Paperclip,
+	Plus,
+	Search,
 	Settings,
-	Sparkles,
-	UserCircle,
 	X,
 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ComponentProps } from 'react'
+import type { LucideIcon } from 'lucide-react'
+import { twMerge } from 'tailwind-merge'
 import { GeminiMark } from '@/components/gemini/gemini-mark'
-import { SidebarItem } from '@/components/gemini/sidebar-item'
+import { Avatar } from '@/components/ui/avatar'
 import { IconButton } from '@/components/ui/icon-button'
 
 export interface SidebarProps {
+	desktopOpen?: boolean
 	onNewConversation?: () => void
+	onDesktopOpenChange?: (open: boolean) => void
 	onOpenChange: (open: boolean) => void
 	open: boolean
 }
 
-const sidebarItems = [
-	{
-		description: 'Começar uma conversa limpa',
-		icon: MessageSquarePlus,
-		id: 'new-chat',
-		label: 'Nova conversa',
-	},
-	{
-		description: 'Descobrir assistentes e ideias',
-		icon: Sparkles,
-		id: 'gems',
-		label: 'Explorar Gems',
-	},
-	{
-		description: 'Retomar assuntos recentes',
-		icon: History,
-		id: 'history',
-		label: 'Histórico recente',
-	},
-	{
-		description: 'Preferências da experiência',
-		icon: Settings,
-		id: 'settings',
-		label: 'Configurações',
-	},
-	{
-		description: 'Dicas e suporte',
-		icon: HelpCircle,
-		id: 'help',
-		label: 'Ajuda',
-	},
+interface SidebarButtonProps extends ComponentProps<'button'> {
+	active?: boolean
+	badge?: string
+	icon: LucideIcon
+	label: string
+}
+
+interface SectionTitleProps {
+	children: string
+	collapsible?: boolean
+}
+
+const recentItems = [
+	'Deixe essa foto profissional para ser usada no LinkedIn',
+	'Pedido de Liberação para Evento',
+	'Gerando Pôster Oficial da Copa 2026',
+	'Otimização de Currículo para Gupy',
+	'Design System Claude Creator',
+	'Logo Minimalista para Sistema de Sorteios',
+	'Atualizar Links de Galeria Específicos',
+	'Verificação de Domínio Resend para E-mail',
+	'Erro Pointer Lock em iOS',
+	'Estudo de Migração WebGL para WebGPU',
 ]
 
 const focusableSelector = [
@@ -62,59 +62,226 @@ const focusableSelector = [
 	'[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
-interface SidebarBrandProps {
-	titleId: string
+function SidebarButton({
+	active = false,
+	badge,
+	className,
+	icon: Icon,
+	label,
+	...props
+}: SidebarButtonProps) {
+	return (
+		<button
+			type="button"
+			data-slot="sidebar-button"
+			data-active={active ? '' : undefined}
+			className={twMerge(
+				'group flex min-h-10 w-full items-center gap-3 rounded-full px-4 text-left text-sm font-semibold text-foreground transition-all duration-200',
+				'hover:bg-white/7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer',
+				active ? 'bg-black/22 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : '',
+				className,
+			)}
+			{...props}
+		>
+			<Icon
+				aria-hidden="true"
+				className="size-5 shrink-0 text-foreground"
+			/>
+			<span className="min-w-0 flex-1 truncate">{label}</span>
+			{badge ? (
+				<span className="rounded-full bg-white/14 px-2 py-0.5 text-xs font-medium text-foreground-subtle">
+					{badge}
+				</span>
+			) : null}
+		</button>
+	)
 }
 
-function SidebarBrand({ titleId }: SidebarBrandProps) {
+function SectionTitle({ children, collapsible = false }: SectionTitleProps) {
 	return (
-		<div className="flex min-w-0 items-center gap-3">
-			<GeminiMark
-				size="md"
-				aria-label="Gemini"
+		<div className="mt-7 flex h-7 items-center gap-1 px-4 text-sm font-medium text-muted-foreground">
+			<span>{children}</span>
+			{collapsible ? (
+				<ChevronDown
+					aria-hidden="true"
+					className="size-4"
+				/>
+			) : null}
+		</div>
+	)
+}
+
+function RecentItem({ children }: { children: string }) {
+	return (
+		<button
+			type="button"
+			data-slot="recent-item"
+			className="group flex min-h-10 w-full items-center gap-2 rounded-full px-4 text-left text-sm font-semibold text-foreground transition-colors hover:bg-white/7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
+		>
+			<span className="min-w-0 flex-1 truncate">{children}</span>
+			<MoreVertical
+				aria-hidden="true"
+				className="size-4 shrink-0 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 cursor-pointer"
 			/>
-			<div className="min-w-0">
+		</button>
+	)
+}
+
+function SidebarHeader({
+	expanded = true,
+	isMobile = false,
+	onToggle,
+	titleId,
+}: {
+	expanded?: boolean
+	isMobile?: boolean
+	onToggle?: () => void
+	titleId: string
+}) {
+	const tooltipLabel = expanded ? 'Fechar barra lateral' : 'Abrir barra lateral'
+
+	return (
+		<div
+			className={twMerge(
+				'flex h-16 shrink-0 items-center gap-3',
+				expanded ? 'justify-between px-5' : 'justify-center px-3',
+			)}
+		>
+			{expanded ? (
+				<div className="flex min-w-0 items-center gap-3 cursor-pointer">
+					<GeminiMark
+						size="sm"
+						aria-label="Gemini"
+					/>
+					<h2
+						id={titleId}
+						className="truncate text-xl font-semibold text-foreground"
+					>
+						Gemini
+					</h2>
+				</div>
+			) : (
 				<h2
 					id={titleId}
-					className="truncate text-base font-semibold text-foreground"
+					className="sr-only"
 				>
-					Menu Gemini
+					Gemini
 				</h2>
-				<p className="truncate text-xs text-muted-foreground">
-					Navegue pela experiência
-				</p>
+			)}
+			<div className="group relative">
+				<IconButton
+					aria-label={tooltipLabel}
+					variant="ghost"
+					size="lg"
+					title={tooltipLabel}
+					className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+					onClick={onToggle}
+				>
+					{isMobile ? (
+						<X aria-hidden="true" color='white' />
+					) : (
+						<PanelLeftClose
+							aria-hidden="true"
+							className={expanded ? '' : 'rotate-180'}
+						/>
+					)}
+				</IconButton>
+				{isMobile ? null : (
+					<span
+						role="tooltip"
+						className={twMerge(
+							'pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-white/70 bg-white px-4 py-2 text-sm font-medium text-[#202124] opacity-0 shadow-[0_12px_35px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-opacity duration-150 group-hover:opacity-100',
+						)}
+					>
+						{tooltipLabel}
+					</span>
+				)}
 			</div>
 		</div>
 	)
 }
 
-interface SidebarNavigationProps {
-	onItemClick: (itemId: string) => void
-	tabIndex?: number
-}
-
-function SidebarNavigation({ onItemClick, tabIndex }: SidebarNavigationProps) {
+function SidebarContent({ onNewConversation }: { onNewConversation?: () => void }) {
 	return (
-		<nav
-			aria-label="Menu principal"
-			className="flex flex-1 flex-col gap-1"
-		>
-			{sidebarItems.map((item) => (
-				<SidebarItem
-					key={item.id}
-					description={item.description}
-					icon={item.icon}
-					label={item.label}
-					tabIndex={tabIndex}
-					onClick={() => onItemClick(item.id)}
+		<div className="flex min-h-0 flex-1 flex-col">
+			<div className="shrink-0 space-y-1 px-2 pb-3">
+				<SidebarButton
+					active
+					icon={Paperclip}
+					label="Nova conversa"
+					onClick={onNewConversation}
 				/>
-			))}
-		</nav>
+				<SidebarButton
+					icon={Search}
+					label="Pesquisar conversas"
+				/>
+				<SidebarButton
+					badge="Novo"
+					icon={Image}
+					label="Imagens"
+				/>
+				<SidebarButton
+					icon={Clapperboard}
+					label="Vídeos"
+				/>
+				<SidebarButton
+					icon={Library}
+					label="Biblioteca"
+				/>
+			</div>
+			<div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+				<SectionTitle collapsible>Notebooks</SectionTitle>
+				<SidebarButton
+					icon={Plus}
+					label="Novo notebook"
+					className="mt-1"
+				/>
+				<SectionTitle collapsible>Recentes</SectionTitle>
+				<div className="mt-1 space-y-1">
+					{recentItems.map((item) => (
+						<RecentItem key={item}>{item}</RecentItem>
+					))}
+				</div>
+			</div>
+		</div>
 	)
 }
 
-export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps) {
-	const closeButtonRef = useRef<HTMLButtonElement>(null)
+function SidebarFooter() {
+	return (
+		<div className="flex h-20 shrink-0 items-center gap-3 px-4">
+			<Avatar
+				name="Euller Gomes"
+				size="md"
+				variant="glass"
+				aria-label="Euller Gomes"
+			/>
+			<div className="min-w-0 flex-1">
+				<p className="truncate text-sm font-semibold text-foreground">Euller Gomes</p>
+				<p className="text-xs font-medium text-muted-foreground">Pro</p>
+			</div>
+			<div className="relative">
+				<IconButton
+					aria-label="Configurações"
+					variant="ghost"
+					size="lg"
+					className="text-foreground hover:bg-white/10"
+				>
+					<Settings aria-hidden="true" />
+				</IconButton>
+				<span className="absolute right-2 top-2 size-2.5 rounded-full bg-gemini-blue shadow-[0_0_12px_rgba(64,156,255,0.95)]" />
+			</div>
+		</div>
+	)
+}
+
+export function Sidebar({
+	desktopOpen = true,
+	onDesktopOpenChange,
+	onNewConversation,
+	onOpenChange,
+	open,
+}: SidebarProps) {
 	const panelRef = useRef<HTMLElement>(null)
 	const previousFocusRef = useRef<HTMLElement | null>(null)
 
@@ -131,7 +298,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 		document.body.style.overflow = 'hidden'
 
 		const focusTimeout = window.setTimeout(() => {
-			closeButtonRef.current?.focus()
+			panelRef.current?.querySelector<HTMLElement>(focusableSelector)?.focus()
 		}, 0)
 
 		return () => {
@@ -192,54 +359,63 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 		onOpenChange(false)
 	}
 
-	const handleItemClick = (itemId: string) => {
-		if (itemId === 'new-chat') {
-			onNewConversation?.()
-		}
+	const toggleDesktopSidebar = () => {
+		onDesktopOpenChange?.(!desktopOpen)
+	}
 
+	const startNewConversation = () => {
+		onNewConversation?.()
 		closeSidebar()
 	}
 
 	return (
 		<>
 			<aside
-				data-slot="desktop-rail"
-				aria-label="Atalhos do Gemini"
-				className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center justify-between border-r border-white/5 bg-background/45 px-3 py-6 backdrop-blur-xl desktop:flex"
+				data-slot="desktop-sidebar"
+				data-state={desktopOpen ? 'open' : 'closed'}
+				aria-labelledby="gemini-desktop-sidebar-title"
+				className={twMerge(
+					'fixed inset-y-0 left-0 z-20 hidden flex-col border-r border-white/6 bg-[#1f1f1f]/88 shadow-[24px_0_70px_rgba(0,0,0,0.22)] backdrop-blur-2xl transition-[width] duration-300 ease-out motion-reduce:transition-none desktop:flex',
+					desktopOpen ? 'w-[22.5rem]' : 'w-16',
+				)}
 			>
-				<div className="flex flex-col items-center gap-8">
-					<GeminiMark
-						size="sm"
-						aria-label="Gemini"
-					/>
-					<IconButton
-						aria-label="Nova conversa"
-						variant="ghost"
-						size="sm"
-						className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
-						onClick={() => handleItemClick('new-chat')}
-					>
-						<MessageSquarePlus aria-hidden="true" />
-					</IconButton>
-				</div>
-				<div className="flex flex-col items-center gap-5">
-					<IconButton
-						aria-label="Configurações"
-						variant="ghost"
-						size="sm"
-						className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
-					>
-						<Settings aria-hidden="true" />
-					</IconButton>
-					<IconButton
-						aria-label="Perfil"
-						variant="ghost"
-						size="sm"
-						className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
-					>
-						<UserCircle aria-hidden="true" />
-					</IconButton>
-				</div>
+				<SidebarHeader
+					expanded={desktopOpen}
+					titleId="gemini-desktop-sidebar-title"
+					onToggle={toggleDesktopSidebar}
+				/>
+				{desktopOpen ? (
+					<>
+						<SidebarContent onNewConversation={startNewConversation} />
+						<SidebarFooter />
+					</>
+				) : (
+					<div className="flex flex-1 flex-col items-center justify-between px-2 pb-5 pt-2">
+						<div className="flex flex-col items-center gap-5">
+							<GeminiMark
+								size="sm"
+								aria-label="Gemini"
+							/>
+							<IconButton
+								aria-label="Nova conversa"
+								variant="ghost"
+								size="md"
+								className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+								onClick={onNewConversation}
+							>
+								<Paperclip aria-hidden="true" />
+							</IconButton>
+						</div>
+						<IconButton
+							aria-label="Configurações"
+							variant="ghost"
+							size="lg"
+							className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+						>
+							<Settings aria-hidden="true" />
+						</IconButton>
+					</div>
+				)}
 			</aside>
 			<div
 				data-slot="sidebar-root"
@@ -250,7 +426,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 					type="button"
 					aria-label="Fechar menu"
 					tabIndex={open ? 0 : -1}
-					className={`absolute inset-0 cursor-default bg-black/55 backdrop-blur-md transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
+					className={`absolute inset-0 cursor-default bg-black/55 backdrop-blur-sm transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
 					data-open={open ? '' : undefined}
 					onClick={closeSidebar}
 				/>
@@ -263,31 +439,20 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 					aria-labelledby="gemini-sidebar-title"
 					data-slot="sidebar"
 					data-open={open ? '' : undefined}
-					className="glass-elevated glass-inner-glow fixed inset-y-0 flex w-[min(20rem,calc(100vw-2rem))] flex-col rounded-r-3xl border-y-0 border-l-0 p-3 shadow-glass transition-[left] duration-300 ease-out motion-reduce:transition-none"
+					className="fixed inset-y-0 flex w-[min(25rem,calc(90vw-2rem))] flex-col rounded-r-[1.45rem] border-r border-white/8 bg-[#1f1f1f]/92 shadow-[24px_0_70px_rgba(0,0,0,0.32)] backdrop-blur-2xl transition-[left] duration-300 ease-out motion-reduce:transition-none"
 					style={{
-						left: open ? '0' : '-20rem',
+						left: open ? '0' : '-25rem',
 						transform: 'none',
 						translate: 'none',
 					}}
 				>
-					<div className="flex items-center justify-between gap-3 px-1 pb-5 pt-2">
-						<SidebarBrand titleId="gemini-sidebar-title" />
-						<IconButton
-							ref={closeButtonRef}
-							aria-label="Fechar menu"
-							variant="ghost"
-							size="sm"
-							tabIndex={open ? 0 : -1}
-							className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
-							onClick={closeSidebar}
-						>
-							<X aria-hidden="true" />
-						</IconButton>
-					</div>
-					<SidebarNavigation
-						tabIndex={open ? 0 : -1}
-						onItemClick={handleItemClick}
+					<SidebarHeader
+						isMobile
+						titleId="gemini-sidebar-title"
+						onToggle={closeSidebar}
 					/>
+					<SidebarContent onNewConversation={startNewConversation} />
+					<SidebarFooter />
 				</aside>
 			</div>
 		</>

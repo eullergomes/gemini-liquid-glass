@@ -19,6 +19,7 @@ export function GeminiHeader({ isMenuOpen, onMenuOpen }: GeminiHeaderProps) {
 					aria-label="Abrir menu"
 					variant="ghost"
 					size="md"
+					className="desktop:hidden"
 					aria-controls="gemini-sidebar"
 					aria-expanded={isMenuOpen}
 					aria-haspopup="dialog"
@@ -33,7 +34,7 @@ export function GeminiHeader({ isMenuOpen, onMenuOpen }: GeminiHeaderProps) {
 					<Button
 						variant="ghost"
 						size="sm"
-						className="-ml-2 h-7 rounded-full px-2 text-xs text-muted-foreground hover:bg-surface-raised"
+						className="-ml-2 h-7 rounded-full px-2 text-xs text-muted-foreground hover:bg-surface-raised desktop:ml-0"
 					>
 						<span>1.5 Flash</span>
 						<ChevronDown aria-hidden="true" />

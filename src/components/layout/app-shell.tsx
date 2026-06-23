@@ -232,7 +232,7 @@ export function AppShell() {
 			/>
 			<main
 				data-slot="app-main"
-				className="relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-40 pt-24"
+				className="relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-40 pt-24 desktop:mx-0 desktop:ml-80 desktop:w-[calc(100%_-_20rem)] desktop:max-w-5xl desktop:px-8 desktop:pt-28"
 			>
 				{hasMessages ? (
 					<div className="animate-liquid-enter flex flex-1 flex-col">

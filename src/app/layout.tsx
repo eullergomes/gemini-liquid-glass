@@ -1,30 +1,31 @@
-import type { Metadata } from "next";
-import { Google_Sans_Flex } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Google_Sans_Flex } from 'next/font/google'
+import type { ReactNode } from 'react'
+import './globals.css'
 
 const googleSansFlex = Google_Sans_Flex({
 	subsets: ['latin'],
 	weight: ['300', '400', '500', '600', '700', '800'],
 	style: 'normal',
-	display: 'swap'
-});
+	display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: "Gemini Liquid Glass",
-  description: "Um assistente de IA baseado no Gemini 1.5 Flash, projetado para fornecer respostas úteis, objetivas e amigáveis em português do Brasil.",
-};
+	title: 'Gemini Liquid Glass',
+	description: 'Um assistente de IA baseado no Gemini 2.5 Flash, projetado para fornecer respostas úteis, objetivas e amigáveis em português do Brasil.',
+}
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: ReactNode
 }>) {
-  return (
-    <html
-      lang="pt-BR"
-      className={`${googleSansFlex.className} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  );
+	return (
+		<html
+			lang="pt-BR"
+			className={`${googleSansFlex.className} h-full antialiased`}
+		>
+			<body className="flex min-h-full flex-col">{children}</body>
+		</html>
+	)
 }

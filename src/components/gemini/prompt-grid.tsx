@@ -24,7 +24,7 @@ export function PromptGrid({
 	return (
 		<div
 			data-slot="prompt-grid"
-			className="grid grid-cols-1 gap-3 min-[560px]:grid-cols-2"
+			className="grid grid-cols-1 gap-3 min-[560px]:grid-cols-2 desktop:grid-cols-4"
 			{...props}
 		>
 			{suggestions.map((suggestion, index) => (

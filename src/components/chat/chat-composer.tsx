@@ -35,11 +35,11 @@ export function ChatComposer({ disabled = false, onSubmit }: ChatComposerProps) 
 	return (
 		<div
 			data-slot="chat-composer-wrap"
-			className="pointer-events-none fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-background via-background/95 to-transparent px-3 pb-3 pt-12"
+			className="pointer-events-none fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-background via-background/95 to-transparent px-3 pb-3 pt-12 desktop:left-80 desktop:px-8 desktop:pb-6"
 		>
 			<form
 				data-slot="chat-composer"
-				className="glass-elevated glass-inner-glow pointer-events-auto mx-auto max-w-4xl rounded-xl p-2 transition-all duration-300 focus-within:-translate-y-0.5 focus-within:shadow-glass-focus"
+				className="glass-elevated glass-inner-glow pointer-events-auto mx-auto max-w-4xl rounded-xl p-2 transition-all duration-300 focus-within:-translate-y-0.5 focus-within:shadow-glass-focus desktop:max-w-3xl"
 				onSubmit={handleSubmit}
 			>
 				<label

@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gemini Liquid Glass Web App
 
-## Getting Started
+Web app mobile first inspirado na experiência do Gemini, com visual Liquid Glass e chat funcional integrado à Gemini API por uma rota server-side do Next.js.
 
-First, run the development server:
+O objetivo do projeto é entregar uma interface polida para teste técnico: responsiva, acessível, com arquitetura simples, tokens visuais consistentes e sem exposição de chaves no client.
+
+## Stack
+
+- Next.js com App Router
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Tailwind Variants
+- Tailwind Merge
+- Lucide React
+- Vercel AI SDK
+- Google Gemini API via `@ai-sdk/google`
+- Zod para validação do payload da API
+
+## Como Rodar Localmente
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Crie o arquivo de ambiente local a partir do exemplo:
+
+```bash
+cp .env.example .env.local
+```
+
+No Windows PowerShell, se preferir:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+Preencha a variável no `.env.local`:
+
+```txt
+GOOGLE_GENERATIVE_AI_API_KEY=
+```
+
+Substitua o valor vazio pela sua chave gerada no Google AI Studio.
+
+Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variáveis de Ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variável | Obrigatória | Descrição |
+| --- | --- | --- |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Sim | Chave da Google AI Studio usada somente na rota server-side `src/app/api/chat/route.ts`. |
 
-## Learn More
+O arquivo `.env.example` não contém valores reais. Nunca coloque a chave diretamente em componentes client-side.
 
-To learn more about Next.js, take a look at the following resources:
+## Integração com IA
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+O chat envia mensagens para `src/app/api/chat/route.ts`, que roda no servidor. A rota valida o payload com Zod, verifica se `GOOGLE_GENERATIVE_AI_API_KEY` está configurada e usa o Vercel AI SDK para gerar resposta em streaming.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+O modelo configurado em `src/lib/ai.ts` é:
 
-## Deploy on Vercel
+```txt
+gemini-2.5-flash
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+O prompt de sistema orienta o assistente a responder em português do Brasil por padrão. Quando a chave está ausente ou a API falha, a UI exibe uma mensagem amigável e opção de tentar novamente.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Decisões de Design
+
+- A UI é original, mas inspirada em padrões de interação do Gemini.
+- O visual Liquid Glass usa superfícies translúcidas, blur, brilho interno, sombras suaves e gradientes ambientais.
+- Os componentes reutilizáveis usam `data-slot`, `tailwind-variants` e `tailwind-merge`.
+- Botões de ícone possuem `aria-label`.
+- Estados de vazio, loading, erro e conversa foram implementados.
+- Animações são sutis e respeitam `prefers-reduced-motion`.
+
+## Estratégia Responsiva
+
+A implementação é mobile first.
+
+- De `0px` até `959px`, a experiência mantém a composição mobile/tablet com header superior, drawer lateral e composer fixo no rodapé.
+- A partir de `960px`, o breakpoint customizado `desktop` ativa uma sidebar persistente, desloca o conteúdo principal e centraliza o composer em uma largura confortável.
+- A aplicação não usa `max-w-[959px]` como limite global.
+- Larguras máximas aparecem apenas em regiões internas, como conteúdo principal e composer, para preservar legibilidade.
+
+## Scripts
+
+```bash
+npm run dev
+npm run lint
+npm run build
+npm run start
+```
+
+Observação: não há script `typecheck` separado neste momento; a checagem TypeScript roda durante `npm run build`.
+
+## Checklist de Features
+
+- [x] Shell principal mobile first
+- [x] Header inspirado no Gemini
+- [x] Drawer lateral com fechamento por Escape e clique fora
+- [x] Cards de sugestões
+- [x] Composer fixo no rodapé
+- [x] Estado vazio
+- [x] Estado de conversa
+- [x] Estado de loading
+- [x] Estado de erro com retry
+- [x] Chat server-side com Gemini API
+- [x] Streaming de resposta quando disponível
+- [x] `.env.example` sem segredo real
+- [x] Breakpoint desktop em `960px`
+- [x] Polimento visual Liquid Glass
+- [x] Revisão de acessibilidade e responsividade nos tamanhos principais
+
+## Validação Recomendada
+
+Antes de entregar ou fazer deploy, rode:
+
+```bash
+npm run lint
+npm run build
+```
+
+Também vale revisar manualmente as larguras:
+
+```txt
+360px, 375px, 430px, 768px, 959px, 960px, 1280px
+```
+
+Verifique se não há overflow horizontal, se o composer permanece visível, se o foco é perceptível via teclado e se o drawer mantém navegação acessível.

@@ -1,25 +1,36 @@
 import { ChevronDown, Menu } from 'lucide-react'
-import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
 
 export interface GeminiHeaderProps {
 	isMenuOpen: boolean
+	modelLabel?: string
 	onMenuOpen: () => void
 }
 
-export function GeminiHeader({ isMenuOpen, onMenuOpen }: GeminiHeaderProps) {
+const desktopNavItems = [
+	'Sobre o Gemini',
+	'Baixar o app do Gemini',
+	'Assinaturas',
+	'Para empresas',
+]
+
+export function GeminiHeader({
+	isMenuOpen,
+	modelLabel = 'Gemini 2.5 Flash',
+	onMenuOpen,
+}: GeminiHeaderProps) {
 	return (
 		<header
 			data-slot="gemini-header"
-			className="fixed inset-x-0 top-0 z-30 flex h-20 items-center justify-between px-3"
+			className="fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between px-4 text-foreground desktop:h-20 desktop:pl-20 desktop:pr-4"
 		>
-			<div className="flex min-w-0 items-center gap-2">
+			<div className="flex min-w-0 items-center gap-3 desktop:hidden">
 				<IconButton
 					aria-label="Abrir menu"
 					variant="ghost"
 					size="md"
-					className="desktop:hidden"
+					className="text-foreground hover:bg-white/10 hover:text-foreground"
 					aria-controls="gemini-sidebar"
 					aria-expanded={isMenuOpen}
 					aria-haspopup="dialog"
@@ -27,26 +38,35 @@ export function GeminiHeader({ isMenuOpen, onMenuOpen }: GeminiHeaderProps) {
 				>
 					<Menu aria-hidden="true" />
 				</IconButton>
-				<div className="min-w-0">
-					<p className="truncate text-xl font-medium leading-6 text-foreground">
-						Gemini
-					</p>
-					<Button
-						variant="ghost"
-						size="sm"
-						className="-ml-2 h-7 rounded-full px-2 text-xs text-muted-foreground hover:bg-surface-raised desktop:ml-0"
-					>
-						<span>1.5 Flash</span>
-						<ChevronDown aria-hidden="true" />
-					</Button>
-				</div>
+				<Button
+					variant="ghost"
+					size="sm"
+					className="h-9 rounded-full px-1 text-base font-semibold text-foreground hover:bg-white/10"
+				>
+					<span className="truncate">{modelLabel}</span>
+					<ChevronDown aria-hidden="true" />
+				</Button>
 			</div>
-			<Avatar
-				name="Eulle"
+			<nav
+				aria-label="Links do Gemini"
+				className="ml-auto hidden items-center gap-5 text-sm font-medium text-foreground-subtle desktop:flex"
+			>
+				{desktopNavItems.map((item) => (
+					<span
+						key={item}
+						className="whitespace-nowrap"
+					>
+						{item}
+					</span>
+				))}
+			</nav>
+			<Button
+				variant="primary"
 				size="md"
-				variant="glass"
-				aria-label="Perfil do usuário"
-			/>
+				className="h-11 rounded-full border-transparent px-5 text-sm font-semibold shadow-none desktop:ml-6 desktop:h-12 desktop:px-6 desktop:text-base"
+			>
+				Fazer login
+			</Button>
 		</header>
 	)
 }

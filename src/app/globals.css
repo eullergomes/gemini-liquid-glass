@@ -1,40 +1,40 @@
 @import "tailwindcss";
 
 :root {
-	--background: oklch(98.6% 0.018 247);
-	--surface: oklch(100% 0 0 / 64%);
-	--surface-raised: oklch(100% 0 0 / 78%);
-	--primary: oklch(58% 0.19 258);
-	--primary-hover: oklch(53% 0.21 258);
-	--secondary: oklch(94.5% 0.031 250 / 72%);
-	--muted: oklch(91.5% 0.025 250 / 64%);
-	--destructive: oklch(59% 0.22 27);
-	--foreground: oklch(22% 0.035 260);
-	--foreground-subtle: oklch(38% 0.04 255);
-	--muted-foreground: oklch(50% 0.035 255);
-	--primary-foreground: oklch(99% 0.005 255);
-	--border: oklch(100% 0 0 / 44%);
-	--input: oklch(100% 0 0 / 70%);
-	--ring: oklch(64% 0.19 258);
+	--background: oklch(7.5% 0.012 260);
+	--surface: oklch(16% 0.018 260 / 66%);
+	--surface-raised: oklch(20% 0.019 260 / 82%);
+	--primary: oklch(55% 0.18 247);
+	--primary-hover: oklch(61% 0.17 247);
+	--secondary: oklch(22% 0.018 260 / 76%);
+	--muted: oklch(24% 0.016 260 / 66%);
+	--destructive: oklch(66% 0.21 24);
+	--foreground: oklch(90% 0.012 255);
+	--foreground-subtle: oklch(75% 0.014 255);
+	--muted-foreground: oklch(66% 0.015 255);
+	--primary-foreground: oklch(97% 0.008 255);
+	--border: oklch(100% 0 0 / 11%);
+	--input: oklch(100% 0 0 / 8%);
+	--ring: oklch(70% 0.16 247);
 	--gemini-blue: oklch(64% 0.18 252);
 	--gemini-violet: oklch(62% 0.21 302);
 	--gemini-rose: oklch(68% 0.18 8);
 	--gemini-cyan: oklch(78% 0.13 205);
-	--glass-opacity: 0.68;
-	--glass-blur: 28px;
-	--glass-border: oklch(100% 0 0 / 44%);
-	--glass-highlight: oklch(100% 0 0 / 74%);
-	--glass-shadow: 0 24px 80px oklch(45% 0.07 260 / 14%);
-	--glass-shadow-soft: 0 14px 40px oklch(45% 0.06 260 / 10%);
-	--glass-shadow-focus: 0 18px 60px oklch(58% 0.16 258 / 20%);
+	--glass-opacity: 0.74;
+	--glass-blur: 30px;
+	--glass-border: oklch(100% 0 0 / 11%);
+	--glass-highlight: oklch(100% 0 0 / 16%);
+	--glass-shadow: 0 24px 90px oklch(0% 0 0 / 42%);
+	--glass-shadow-soft: 0 14px 48px oklch(0% 0 0 / 30%);
+	--glass-shadow-focus: 0 18px 60px oklch(62% 0.16 247 / 22%);
 	--radius-sm: 0.5rem;
 	--radius-md: 0.875rem;
 	--radius-lg: 1.25rem;
 	--radius-xl: 1.75rem;
 	--ambient-aura:
-		radial-gradient(circle at 12% 16%, oklch(72% 0.16 252 / 28%), transparent 34rem),
-		radial-gradient(circle at 86% 10%, oklch(70% 0.18 316 / 22%), transparent 28rem),
-		radial-gradient(circle at 50% 92%, oklch(80% 0.12 205 / 24%), transparent 30rem);
+		radial-gradient(circle at 50% 58%, oklch(31% 0.13 253 / 48%), transparent 25rem),
+		radial-gradient(circle at 50% 105%, oklch(27% 0.16 256 / 62%), transparent 28rem),
+		radial-gradient(circle at 82% 18%, oklch(22% 0.08 288 / 16%), transparent 30rem);
 }
 
 @theme inline {
@@ -70,30 +70,7 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--background: oklch(15% 0.035 260);
-		--surface: oklch(24% 0.038 260 / 58%);
-		--surface-raised: oklch(30% 0.041 260 / 68%);
-		--primary: oklch(69% 0.17 252);
-		--primary-hover: oklch(75% 0.15 252);
-		--secondary: oklch(28% 0.04 260 / 68%);
-		--muted: oklch(34% 0.035 260 / 58%);
-		--destructive: oklch(66% 0.21 24);
-		--foreground: oklch(94% 0.014 255);
-		--foreground-subtle: oklch(82% 0.025 255);
-		--muted-foreground: oklch(70% 0.028 255);
-		--primary-foreground: oklch(16% 0.035 260);
-		--border: oklch(100% 0 0 / 14%);
-		--input: oklch(100% 0 0 / 10%);
-		--ring: oklch(75% 0.15 252);
-		--glass-border: oklch(100% 0 0 / 16%);
-		--glass-highlight: oklch(100% 0 0 / 18%);
-		--glass-shadow: 0 24px 80px oklch(0% 0 0 / 34%);
-		--glass-shadow-soft: 0 14px 44px oklch(0% 0 0 / 28%);
-		--glass-shadow-focus: 0 18px 60px oklch(69% 0.17 252 / 18%);
-		--ambient-aura:
-			radial-gradient(circle at 10% 18%, oklch(56% 0.18 252 / 22%), transparent 34rem),
-			radial-gradient(circle at 88% 12%, oklch(57% 0.18 316 / 18%), transparent 28rem),
-			radial-gradient(circle at 50% 94%, oklch(60% 0.12 205 / 18%), transparent 30rem);
+		color-scheme: dark;
 	}
 }
 
@@ -111,7 +88,7 @@ body {
 	margin: 0;
 	background:
 		var(--ambient-aura),
-		linear-gradient(145deg, var(--background) 0%, oklch(96% 0.022 255) 46%, var(--background) 100%);
+		linear-gradient(180deg, oklch(7% 0.01 260) 0%, var(--background) 58%, oklch(12% 0.05 260) 100%);
 	color: var(--foreground);
 	font-family: var(--font-sans);
 	text-rendering: optimizeLegibility;
@@ -147,7 +124,7 @@ select {
 		position: relative;
 		background:
 			var(--ambient-aura),
-			linear-gradient(145deg, var(--background) 0%, color-mix(in oklch, var(--background) 86%, var(--gemini-blue)) 100%);
+			linear-gradient(180deg, oklch(7% 0.01 260) 0%, var(--background) 58%, oklch(13% 0.065 260) 100%);
 	}
 
 	.liquid-background::before {
@@ -156,9 +133,9 @@ select {
 		inset: 0;
 		z-index: 0;
 		background-image:
-			linear-gradient(115deg, oklch(100% 0 0 / 14%) 0 1px, transparent 1px 11px),
-			radial-gradient(circle at 35% 20%, oklch(100% 0 0 / 18%), transparent 18rem);
-		opacity: 0.24;
+			radial-gradient(circle at 50% 54%, oklch(56% 0.16 250 / 20%), transparent 28rem),
+			linear-gradient(115deg, oklch(100% 0 0 / 4%) 0 1px, transparent 1px 12px);
+		opacity: 0.52;
 		pointer-events: none;
 		mask-image: linear-gradient(to bottom, black, transparent 82%);
 	}

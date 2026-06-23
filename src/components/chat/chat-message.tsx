@@ -18,7 +18,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 			{isUser ? null : (
 				<span
 					data-slot="assistant-avatar"
-					className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glass-soft"
+					className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-foreground shadow-glass-soft"
 				>
 					<Sparkles
 						aria-hidden="true"
@@ -28,10 +28,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
 			)}
 			<div
 				data-slot="message-bubble"
-				className={`max-w-[82%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm leading-6 shadow-glass-soft transition-shadow duration-300 ${
+				className={`max-w-[86%] whitespace-pre-wrap rounded-[1.35rem] px-4 py-3 text-sm leading-6 transition-shadow duration-300 desktop:max-w-[78%] ${
 					isUser
-						? 'bg-primary text-primary-foreground'
-						: 'glass-panel glass-inner-glow text-foreground hover:shadow-glass-focus'
+						? 'bg-[#2f3337] text-foreground shadow-glass-soft'
+						: 'bg-transparent text-foreground'
 				}`}
 			>
 				{message.content}

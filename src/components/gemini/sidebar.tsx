@@ -1,16 +1,18 @@
 'use client'
 
 import {
-	Compass,
 	HelpCircle,
 	History,
-	Plus,
+	MessageSquarePlus,
 	Settings,
 	Sparkles,
+	UserCircle,
 	X,
 } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { GeminiMark } from '@/components/gemini/gemini-mark'
 import { SidebarItem } from '@/components/gemini/sidebar-item'
+import { IconButton } from '@/components/ui/icon-button'
 
 export interface SidebarProps {
 	onNewConversation?: () => void
@@ -21,7 +23,7 @@ export interface SidebarProps {
 const sidebarItems = [
 	{
 		description: 'Começar uma conversa limpa',
-		icon: Plus,
+		icon: MessageSquarePlus,
 		id: 'new-chat',
 		label: 'Nova conversa',
 	},
@@ -67,12 +69,10 @@ interface SidebarBrandProps {
 function SidebarBrand({ titleId }: SidebarBrandProps) {
 	return (
 		<div className="flex min-w-0 items-center gap-3">
-			<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glass-soft">
-				<Compass
-					aria-hidden="true"
-					className="size-5"
-				/>
-			</span>
+			<GeminiMark
+				size="md"
+				aria-label="Gemini"
+			/>
 			<div className="min-w-0">
 				<h2
 					id={titleId}
@@ -110,14 +110,6 @@ function SidebarNavigation({ onItemClick, tabIndex }: SidebarNavigationProps) {
 				/>
 			))}
 		</nav>
-	)
-}
-
-function SidebarTip() {
-	return (
-		<div className="rounded-lg border border-border bg-surface/70 p-3 text-xs leading-5 text-muted-foreground shadow-glass-soft">
-			Respostas mais úteis começam com contexto claro e perguntas específicas.
-		</div>
 	)
 }
 
@@ -211,15 +203,43 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 	return (
 		<>
 			<aside
-				data-slot="desktop-sidebar"
-				aria-labelledby="gemini-desktop-sidebar-title"
-				className="glass-elevated glass-inner-glow fixed inset-y-3 left-3 z-20 hidden w-72 flex-col rounded-xl p-3 shadow-glass desktop:flex"
+				data-slot="desktop-rail"
+				aria-label="Atalhos do Gemini"
+				className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center justify-between border-r border-white/5 bg-background/45 px-3 py-6 backdrop-blur-xl desktop:flex"
 			>
-				<div className="px-1 pb-5 pt-2">
-					<SidebarBrand titleId="gemini-desktop-sidebar-title" />
+				<div className="flex flex-col items-center gap-8">
+					<GeminiMark
+						size="sm"
+						aria-label="Gemini"
+					/>
+					<IconButton
+						aria-label="Nova conversa"
+						variant="ghost"
+						size="sm"
+						className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+						onClick={() => handleItemClick('new-chat')}
+					>
+						<MessageSquarePlus aria-hidden="true" />
+					</IconButton>
 				</div>
-				<SidebarNavigation onItemClick={handleItemClick} />
-				<SidebarTip />
+				<div className="flex flex-col items-center gap-5">
+					<IconButton
+						aria-label="Configurações"
+						variant="ghost"
+						size="sm"
+						className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+					>
+						<Settings aria-hidden="true" />
+					</IconButton>
+					<IconButton
+						aria-label="Perfil"
+						variant="ghost"
+						size="sm"
+						className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+					>
+						<UserCircle aria-hidden="true" />
+					</IconButton>
+				</div>
 			</aside>
 			<div
 				data-slot="sidebar-root"
@@ -230,7 +250,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 					type="button"
 					aria-label="Fechar menu"
 					tabIndex={open ? 0 : -1}
-					className={`absolute inset-0 cursor-default bg-foreground/20 backdrop-blur-md transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
+					className={`absolute inset-0 cursor-default bg-black/55 backdrop-blur-md transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
 					data-open={open ? '' : undefined}
 					onClick={closeSidebar}
 				/>
@@ -243,7 +263,7 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 					aria-labelledby="gemini-sidebar-title"
 					data-slot="sidebar"
 					data-open={open ? '' : undefined}
-					className="glass-elevated glass-inner-glow fixed inset-y-0 flex w-[min(20rem,calc(100vw-2rem))] flex-col rounded-r-xl border-y-0 border-l-0 p-3 shadow-glass transition-[left] duration-300 ease-out motion-reduce:transition-none"
+					className="glass-elevated glass-inner-glow fixed inset-y-0 flex w-[min(20rem,calc(100vw-2rem))] flex-col rounded-r-3xl border-y-0 border-l-0 p-3 shadow-glass transition-[left] duration-300 ease-out motion-reduce:transition-none"
 					style={{
 						left: open ? '0' : '-20rem',
 						transform: 'none',
@@ -252,25 +272,22 @@ export function Sidebar({ onNewConversation, onOpenChange, open }: SidebarProps)
 				>
 					<div className="flex items-center justify-between gap-3 px-1 pb-5 pt-2">
 						<SidebarBrand titleId="gemini-sidebar-title" />
-						<button
-							type="button"
+						<IconButton
 							ref={closeButtonRef}
 							aria-label="Fechar menu"
+							variant="ghost"
+							size="sm"
 							tabIndex={open ? 0 : -1}
-							className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-transparent text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+							className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
 							onClick={closeSidebar}
 						>
-							<X
-								aria-hidden="true"
-								className="size-4"
-							/>
-						</button>
+							<X aria-hidden="true" />
+						</IconButton>
 					</div>
 					<SidebarNavigation
 						tabIndex={open ? 0 : -1}
 						onItemClick={handleItemClick}
 					/>
-					<SidebarTip />
 				</aside>
 			</div>
 		</>

@@ -2,7 +2,7 @@ export function ChatLoading() {
 	return (
 		<div
 			data-slot="chat-loading"
-			className="animate-liquid-pop glass-panel glass-inner-glow flex w-fit items-center gap-2 rounded-full px-3 py-2 text-sm text-muted-foreground"
+			className="animate-liquid-pop flex w-fit items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-sm text-muted-foreground"
 			aria-label="Gemini está digitando"
 		>
 			<span

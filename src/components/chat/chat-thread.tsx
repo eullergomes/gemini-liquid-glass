@@ -35,7 +35,7 @@ export function ChatThread({
 			data-slot="chat-thread"
 			aria-label="Conversa"
 			aria-live="polite"
-			className="flex flex-1 flex-col gap-4 pb-4"
+			className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 pb-4"
 		>
 			{messages.map((message) => (
 				<ChatMessage

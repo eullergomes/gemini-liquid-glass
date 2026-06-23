@@ -75,12 +75,12 @@ export function ChatComposer({
 				</div>
 				<Textarea
 					id="chat-prompt"
-					variant="glass"
+					variant="default"
 					controlSize="sm"
 					rows={1}
 					placeholder="Peça ao Gemini"
 					value={message}
-					className="h-12 min-h-0 flex-1 resize-none overflow-hidden border-transparent bg-transparent px-1 py-3 text-base font-medium leading-6 text-foreground shadow-none placeholder:text-foreground-subtle focus-visible:ring-0 focus-visible:ring-offset-0 desktop:text-lg"
+					className="h-12 min-h-0 flex-1 resize-none overflow-hidden border-0 bg-transparent px-1 py-3 text-base font-medium leading-6 text-foreground shadow-none outline-none ring-0 placeholder:text-foreground-subtle focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:bg-transparent focus-visible:outline-none desktop:text-lg"
 					disabled={disabled}
 					onChange={(event) => setMessage(event.target.value)}
 					onKeyDown={handleKeyDown}

@@ -238,6 +238,15 @@ select {
 		animation: typing-wave 900ms ease-in-out infinite;
 		animation-delay: var(--dot-delay, 0ms);
 	}
+
+	[data-slot="chat-composer"] [data-slot="textarea"],
+	[data-slot="chat-composer"] [data-slot="textarea"]:focus,
+	[data-slot="chat-composer"] [data-slot="textarea"]:focus-visible {
+		border-color: transparent !important;
+		background: transparent !important;
+		box-shadow: none !important;
+		outline: none !important;
+	}
 }
 
 @keyframes liquid-enter {

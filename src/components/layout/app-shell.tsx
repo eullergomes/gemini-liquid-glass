@@ -10,7 +10,7 @@ import { Sidebar } from '@/components/gemini/sidebar'
 import type { ChatApiMessage, ChatMessage } from '@/types/chat'
 
 const modelLabel = 'Gemini 2.5 Flash'
-const heroTitle = 'Conheça o Gemini, seu assistente pessoal de IA'
+const heroTitle = 'Conheça o Gemini, seu assistente pessoal de IA com um visual Liquid Glass'
 const genericErrorMessage = 'Não consegui responder agora. Confira a configuração da API e tente novamente.'
 const friendlyErrorPrefixes = [
 	'A chave',

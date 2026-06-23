@@ -247,6 +247,53 @@ select {
 		box-shadow: none !important;
 		outline: none !important;
 	}
+
+	[data-slot="chat-composer"] [data-slot="textarea"] {
+		scrollbar-width: thin;
+		scrollbar-color: rgb(230 235 245 / 0.5) transparent;
+	}
+
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar {
+		width: 0.45rem;
+	}
+
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-thumb {
+		border-radius: 999px;
+		background: linear-gradient(
+			180deg,
+			rgb(255 255 255 / 0.68),
+			rgb(180 196 225 / 0.44)
+		);
+	}
+
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-thumb:hover {
+		background: linear-gradient(
+			180deg,
+			rgb(255 255 255 / 0.82),
+			rgb(200 216 245 / 0.58)
+		);
+	}
+
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-button,
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-button:single-button,
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-button:vertical,
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-button:vertical:start,
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-button:vertical:end,
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-button:vertical:decrement,
+	[data-slot="chat-composer"] [data-slot="textarea"]::-webkit-scrollbar-button:vertical:increment {
+		display: none !important;
+		width: 0 !important;
+		height: 0 !important;
+		min-width: 0 !important;
+		min-height: 0 !important;
+		background: transparent !important;
+		-webkit-appearance: none;
+	}
+
 }
 
 @keyframes liquid-enter {

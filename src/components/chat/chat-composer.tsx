@@ -1,9 +1,12 @@
 'use client'
 
 import { ChevronDown, Mic, Plus, SendHorizontal } from 'lucide-react'
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { twMerge } from 'tailwind-merge'
 import { IconButton } from '@/components/ui/icon-button'
 import { Textarea } from '@/components/ui/textarea'
+
+const maxVisibleTextareaLines = 7
 
 export interface ChatComposerProps {
 	disabled?: boolean
@@ -19,8 +22,34 @@ export function ChatComposer({
 	placement,
 }: ChatComposerProps) {
 	const [message, setMessage] = useState('')
+	const [isTextareaScrollable, setIsTextareaScrollable] = useState(false)
+	const textareaRef = useRef<HTMLTextAreaElement>(null)
 	const canSubmit = message.trim().length > 0 && !disabled
 	const isHero = placement === 'hero'
+	const hasMessage = message.length > 0
+
+	useLayoutEffect(() => {
+		const textarea = textareaRef.current
+
+		if (!textarea) {
+			return
+		}
+
+		const styles = window.getComputedStyle(textarea)
+		const lineHeight = Number.parseFloat(styles.lineHeight) || 24
+		const paddingTop = Number.parseFloat(styles.paddingTop) || 0
+		const paddingBottom = Number.parseFloat(styles.paddingBottom) || 0
+		const maxHeight = (lineHeight * maxVisibleTextareaLines) + paddingTop + paddingBottom
+
+		textarea.style.height = 'auto'
+
+		const shouldScroll = textarea.scrollHeight > maxHeight + 1
+		const nextHeight = Math.min(textarea.scrollHeight, maxHeight)
+
+		textarea.style.height = `${nextHeight}px`
+		textarea.style.overflowY = shouldScroll ? 'auto' : 'hidden'
+		setIsTextareaScrollable(shouldScroll)
+	}, [message])
 
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
@@ -52,7 +81,14 @@ export function ChatComposer({
 		>
 			<form
 				data-slot="chat-composer"
-				className="glass-elevated pointer-events-auto mx-auto flex h-[4.75rem] w-full max-w-[21.25rem] items-center gap-2 rounded-[2.375rem] border-white/10 bg-[#202124]/90 px-5 shadow-[0_18px_70px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition-all duration-300 focus-within:-translate-y-0.5 focus-within:shadow-glass-focus desktop:h-18 desktop:max-w-[51.5rem] desktop:px-6"
+				data-filled={hasMessage ? '' : undefined}
+				data-scrollable={isTextareaScrollable ? '' : undefined}
+				className={twMerge(
+					'glass-elevated pointer-events-auto mx-auto flex min-h-[4.75rem] w-full max-w-[21.25rem] border-white/10 bg-[#202124]/90 shadow-[0_18px_70px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition-all duration-300 focus-within:-translate-y-0.5 focus-within:shadow-glass-focus desktop:min-h-[4.5rem] desktop:max-w-[51.5rem]',
+					hasMessage
+						? 'flex-wrap content-start items-end gap-x-2 gap-y-2 rounded-[1.875rem] px-4 py-4 desktop:px-5 desktop:py-4'
+						: 'items-center gap-2 rounded-[2.375rem] px-5 py-4 desktop:px-6 desktop:py-3',
+				)}
 				onSubmit={handleSubmit}
 			>
 				<label
@@ -61,7 +97,10 @@ export function ChatComposer({
 				>
 					Mensagem para o Gemini
 				</label>
-				<div className="relative shrink-0">
+				<div
+					className={twMerge('relative shrink-0', hasMessage ? 'order-2' : '')}
+					style={hasMessage ? { order: 2 } : undefined}
+				>
 					<IconButton
 						aria-label="Adicionar arquivo"
 						variant="ghost"
@@ -73,13 +112,19 @@ export function ChatComposer({
 					</IconButton>
 				</div>
 				<Textarea
+					ref={textareaRef}
 					id="chat-prompt"
 					variant="default"
 					controlSize="sm"
 					rows={1}
 					placeholder="Peça ao Gemini"
 					value={message}
-					className="h-12 min-h-0 flex-1 resize-none overflow-hidden border-0 bg-transparent px-1 py-3 text-xl font-medium leading-6 text-foreground shadow-none outline-none ring-0 placeholder:text-foreground-subtle focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:bg-transparent focus-visible:outline-none desktop:text-lg"
+					data-scrollable={isTextareaScrollable ? '' : undefined}
+					className={twMerge(
+						'max-h-[12rem] min-h-12 min-w-0 flex-1 resize-none overflow-y-hidden border-0 bg-transparent text-xl font-medium leading-6 text-foreground shadow-none outline-none ring-0 placeholder:text-foreground-subtle focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:bg-transparent focus-visible:outline-none data-[scrollable]:overflow-y-auto desktop:max-h-[11.25rem] desktop:text-lg',
+						hasMessage ? 'order-1 w-full flex-none basis-full px-2 py-1' : 'px-1 py-3',
+					)}
+					style={hasMessage ? { flex: '0 0 100%', order: 1, width: '100%' } : undefined}
 					disabled={disabled}
 					onChange={(event) => setMessage(event.target.value)}
 					onKeyDown={handleKeyDown}
@@ -87,7 +132,11 @@ export function ChatComposer({
 				{isHero ? (
 					<button
 						type="button"
-						className="hidden h-11 shrink-0 items-center gap-2 rounded-full px-3 text-base font-semibold text-foreground-subtle transition-colors hover:bg-white/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring desktop:inline-flex cursor-pointer"
+						style={hasMessage ? { order: 2 } : undefined}
+						className={twMerge(
+							'hidden h-11 shrink-0 cursor-pointer items-center gap-2 rounded-full px-3 text-base font-semibold text-foreground-subtle transition-colors hover:bg-white/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring desktop:inline-flex',
+							hasMessage ? 'order-2 ml-auto' : '',
+						)}
 					>
 						{modelLabel}
 						<ChevronDown
@@ -101,7 +150,12 @@ export function ChatComposer({
 					variant={canSubmit ? 'primary' : 'ghost'}
 					size="md"
 					type={canSubmit ? 'submit' : 'button'}
-					className={canSubmit ? 'size-11 shadow-glass-soft [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5' : 'size-11 text-foreground-subtle hover:bg-white/10 hover:text-foreground [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5'}
+					style={hasMessage ? { order: 3 } : undefined}
+					className={twMerge(
+						canSubmit ? 'size-11 shadow-glass-soft [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5' : 'size-11 text-foreground-subtle hover:bg-white/10 hover:text-foreground [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5',
+						hasMessage ? 'order-3' : '',
+						hasMessage && !isHero ? 'ml-auto' : '',
+					)}
 					disabled={disabled}
 				>
 					{canSubmit ? (

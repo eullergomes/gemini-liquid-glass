@@ -148,12 +148,19 @@ function RecentItem({
 				return
 			}
 
-			const menuWidth = 128
+			const menuWidth = 112
 			const viewportPadding = 8
-			const nextLeft = Math.min(
-				Math.max(viewportPadding, rect.right - menuWidth),
-				window.innerWidth - menuWidth - viewportPadding,
-			)
+			const isDesktopViewport = window.matchMedia('(min-width: 60rem)').matches
+			const sidebarRect = menuButtonRef.current
+				?.closest<HTMLElement>('[data-slot="sidebar"], [data-slot="desktop-sidebar"]')
+				?.getBoundingClientRect()
+			const mobileAnchorRight = sidebarRect?.right ?? rect.right
+			const preferredLeft = isDesktopViewport
+				? rect.right + 8
+				: mobileAnchorRight + 8
+			const nextLeft = preferredLeft + menuWidth + viewportPadding <= window.innerWidth
+				? preferredLeft
+				: Math.max(viewportPadding, window.innerWidth - menuWidth - viewportPadding)
 
 			setMenuPosition({
 				left: nextLeft,
@@ -211,7 +218,7 @@ function RecentItem({
 			<div
 				ref={menuRef}
 				role="menu"
-				className="fixed z-[120] min-w-32 rounded-xl border border-white/10 bg-[#202124]/96 p-1 shadow-[0_18px_45px_rgba(0,0,0,0.38)] backdrop-blur-2xl"
+				className="fixed z-[120] min-w-28 rounded-2xl border-none p-1.5 backdrop-blur-2xl bg-transparent shadow-[0_10px_24px_rgba(0,0,0,0.22)]"
 				style={{
 					left: menuPosition.left,
 					top: menuPosition.top,
@@ -220,7 +227,7 @@ function RecentItem({
 				<button
 					type="button"
 					role="menuitem"
-					className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-semibold text-destructive transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+					className="glass-inner-glow flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/7 px-4 py-2.5 text-right text-sm font-semibold text-destructive shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_24px_rgba(0,0,0,0.22)] transition-colors hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 					onClick={() => {
 						setIsMenuOpen(false)
 						setIsModalOpen(true)
@@ -262,7 +269,11 @@ function RecentItem({
 						id={dialogDescriptionId}
 						className="mt-2 text-sm leading-6 text-foreground-subtle"
 					>
-						Essa ação não pode ser desfeita. A conversa “{children}” será removida do seu histórico.
+						Essa ação não pode ser desfeita. A conversa{' '}
+						<strong className="font-semibold text-white">
+							“{children}”
+						</strong>{' '}
+						será removida do seu histórico.
 					</p>
 					<div className="mt-5 flex justify-end gap-2">
 						<Button
@@ -316,7 +327,7 @@ function RecentItem({
 					aria-haspopup="menu"
 					variant="ghost"
 					size="sm"
-					className="size-8 text-muted-foreground opacity-0 hover:bg-white/10 hover:text-foreground group-hover:opacity-100 group-focus-within:opacity-100 data-[open]:opacity-100"
+					className="size-8 text-muted-foreground opacity-100 hover:bg-white/10 hover:text-foreground desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-focus-within:opacity-100 data-[open]:opacity-100"
 					data-open={isMenuOpen ? '' : undefined}
 					onClick={(event) => {
 						event.stopPropagation()

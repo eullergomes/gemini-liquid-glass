@@ -3,6 +3,12 @@ import type { ChatApiMessage, ChatMessageRole } from '@/types/chat'
 
 const conversationTitleMaxLength = 56
 
+interface PersistedConversationSummary {
+	id: string
+	title: string
+	updatedAt: Date
+}
+
 function createConversationTitle(content: string) {
 	const normalizedContent = content.replace(/\s+/g, ' ').trim()
 
@@ -52,7 +58,9 @@ export async function ensureUserConversation({
 	})
 }
 
-export async function listUserConversations(userId: string) {
+export async function listUserConversations(
+	userId: string,
+): Promise<PersistedConversationSummary[]> {
 	return prisma.conversation.findMany({
 		where: {
 			userId,

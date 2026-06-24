@@ -2,26 +2,16 @@ import { z } from 'zod'
 import { auth } from '@/auth'
 import { listConversationMessages } from '@/lib/conversations'
 
-const routeContextSchema = z.object({
-	params: z.union([
-		z.promise(
-			z.object({
-				conversationId: z.string().min(1),
-			}),
-		),
-		z.object({
-			conversationId: z.string().min(1),
-		}),
-	]),
-})
+const conversationIdSchema = z.string().min(1)
 
 export async function GET(
 	_request: Request,
-	context: unknown,
+	{ params }: { params: Promise<{ conversationId: string }> },
 ): Promise<Response> {
-	const parsedContext = routeContextSchema.safeParse(context)
+	const { conversationId: rawConversationId } = await params
+	const parsedConversationId = conversationIdSchema.safeParse(rawConversationId)
 
-	if (!parsedContext.success) {
+	if (!parsedConversationId.success) {
 		return Response.json({ error: 'Conversa inválida.' }, { status: 400 })
 	}
 
@@ -32,8 +22,7 @@ export async function GET(
 		return Response.json({ error: 'Faça login para abrir conversas salvas.' }, { status: 401 })
 	}
 
-	const { conversationId } = await parsedContext.data.params
-	const conversation = await listConversationMessages(conversationId, userId)
+	const conversation = await listConversationMessages(parsedConversationId.data, userId)
 
 	if (!conversation) {
 		return Response.json({ error: 'Conversa não encontrada.' }, { status: 404 })

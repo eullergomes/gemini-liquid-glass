@@ -1,7 +1,8 @@
 import { google } from '@ai-sdk/google'
 import type { ModelMessage } from 'ai'
 
-export const GEMINI_MODEL = 'gemini-2.5-flash'
+export const GEMINI_MODEL = process.env.GOOGLE_GENERATIVE_AI_MODEL?.trim()
+	|| 'gemini-2.5-flash-lite'
 
 export const CHAT_SYSTEM_PROMPT = [
 	'Você é um assistente útil, objetivo e amigável.',

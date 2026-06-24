@@ -1,10 +1,12 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
+import { ChatThreadSkeleton } from '@/components/chat/chat-thread-skeleton'
 import { GeminiHeader } from '@/components/gemini/gemini-header'
 import { GeminiMark } from '@/components/gemini/gemini-mark'
 import { Sidebar } from '@/components/gemini/sidebar'
@@ -38,6 +40,10 @@ interface StoredConversationResponse {
 		role: ChatMessage['role']
 	}>
 	title: string
+}
+
+export interface AppShellProps {
+	initialConversationId?: string
 }
 
 function createMessageId(prefix: string) {
@@ -79,18 +85,26 @@ async function readErrorMessage(response: Response) {
 	return genericErrorMessage
 }
 
-export function AppShell() {
+function getConversationPath(conversationId: string) {
+	return `/${encodeURIComponent(conversationId)}`
+}
+
+export function AppShell({ initialConversationId }: AppShellProps) {
+	const router = useRouter()
 	const { data: session, status } = useSession()
 	const userId = session?.user?.id ?? null
-	const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+	const loadingConversationRef = useRef<null | string>(null)
+	const loadedConversationRef = useRef<null | string>(null)
+	const [activeConversationId, setActiveConversationId] = useState<string | null>(initialConversationId ?? null)
 	const [conversations, setConversations] = useState<ConversationSummary[]>([])
 	const [error, setError] = useState<string | null>(null)
 	const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true)
 	const [isLoading, setIsLoading] = useState(false)
-	const [isOpeningConversation, setIsOpeningConversation] = useState(false)
+	const [isOpeningConversation, setIsOpeningConversation] = useState(Boolean(initialConversationId))
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const hasMessages = messages.length > 0
+	const hasConversationView = hasMessages || Boolean(activeConversationId) || isOpeningConversation
 	const canUseSavedConversations = status === 'authenticated'
 	const shellStyle = {
 		'--sidebar-offset': isDesktopSidebarOpen ? '22.5rem' : '4rem',
@@ -118,11 +132,63 @@ export function AppShell() {
 		}
 	}, [canUseSavedConversations])
 
+	const loadConversation = useCallback(async (conversationId: string) => {
+		if (loadingConversationRef.current === conversationId) {
+			return
+		}
+
+		loadingConversationRef.current = conversationId
+		setActiveConversationId(conversationId)
+		setMessages([])
+		setError(null)
+		setIsOpeningConversation(true)
+
+		try {
+			const response = await fetch(`/api/conversations/${encodeURIComponent(conversationId)}`, {
+				cache: 'no-store',
+			})
+
+			if (!response.ok) {
+				throw new Error(await readErrorMessage(response))
+			}
+
+			const payload = await response.json() as StoredConversationResponse
+
+			loadedConversationRef.current = payload.id
+			setActiveConversationId(payload.id)
+			setMessages(payload.messages.map((message) => ({
+				...message,
+				createdAt: new Date(message.createdAt),
+			})))
+			setIsSidebarOpen(false)
+		} catch (caughtError) {
+			loadedConversationRef.current = null
+			setMessages([])
+			setError(getFriendlyErrorMessage(caughtError))
+		} finally {
+			loadingConversationRef.current = null
+			setIsOpeningConversation(false)
+		}
+	}, [])
+
 	useEffect(() => {
+		if (status === 'loading') {
+			return
+		}
+
 		if (status !== 'authenticated') {
 			const resetSessionState = window.setTimeout(() => {
-				setActiveConversationId(null)
 				setConversations([])
+				setIsOpeningConversation(false)
+				loadedConversationRef.current = null
+
+				if (initialConversationId) {
+					setActiveConversationId(initialConversationId)
+					setMessages([])
+					setError('Faça login para abrir conversas salvas.')
+				} else {
+					setActiveConversationId(null)
+				}
 			}, 0)
 
 			return () => window.clearTimeout(resetSessionState)
@@ -130,10 +196,18 @@ export function AppShell() {
 
 		const refreshSessionState = window.setTimeout(() => {
 			void refreshConversations()
+
+			if (
+				initialConversationId
+				&& loadedConversationRef.current !== initialConversationId
+				&& loadingConversationRef.current !== initialConversationId
+			) {
+				void loadConversation(initialConversationId)
+			}
 		}, 0)
 
 		return () => window.clearTimeout(refreshSessionState)
-	}, [refreshConversations, status, userId])
+	}, [initialConversationId, loadConversation, refreshConversations, status, userId])
 
 	const openSidebar = useCallback(() => {
 		setIsSidebarOpen(true)
@@ -169,6 +243,10 @@ export function AppShell() {
 			if (responseConversationId) {
 				nextConversationId = responseConversationId
 				setActiveConversationId(responseConversationId)
+
+				if (canUseSavedConversations && responseConversationId !== activeConversationId) {
+					router.replace(getConversationPath(responseConversationId), { scroll: false })
+				}
 			}
 
 			if (!response.body) {
@@ -228,7 +306,7 @@ export function AppShell() {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [activeConversationId, canUseSavedConversations, refreshConversations])
+	}, [activeConversationId, canUseSavedConversations, refreshConversations, router])
 
 	const submitMessage = useCallback((content: string) => {
 		const trimmedContent = content.trim()
@@ -268,48 +346,27 @@ export function AppShell() {
 
 	const clearConversation = useCallback(() => {
 		setActiveConversationId(null)
+		loadedConversationRef.current = null
 		setError(null)
 		setMessages([])
 		setIsLoading(false)
 		setIsSidebarOpen(false)
-	}, [])
+		router.push('/', { scroll: false })
+	}, [router])
 
 	const openConversation = useCallback(async (conversationId: string) => {
 		if (isLoading || isOpeningConversation) {
 			return
 		}
 
-		setError(null)
-		setIsOpeningConversation(true)
-
-		try {
-			const response = await fetch(`/api/conversations/${conversationId}`, {
-				cache: 'no-store',
-			})
-
-			if (!response.ok) {
-				throw new Error(await readErrorMessage(response))
-			}
-
-			const payload = await response.json() as StoredConversationResponse
-
-			setActiveConversationId(payload.id)
-			setMessages(payload.messages.map((message) => ({
-				...message,
-				createdAt: new Date(message.createdAt),
-			})))
-			setIsSidebarOpen(false)
-		} catch (caughtError) {
-			setError(getFriendlyErrorMessage(caughtError))
-		} finally {
-			setIsOpeningConversation(false)
-		}
-	}, [isLoading, isOpeningConversation])
+		router.push(getConversationPath(conversationId), { scroll: false })
+		void loadConversation(conversationId)
+	}, [isLoading, isOpeningConversation, loadConversation, router])
 
 	return (
 		<div
 			data-slot="app-shell"
-			data-state={hasMessages ? 'chat' : 'empty'}
+			data-state={hasConversationView ? 'chat' : 'empty'}
 			className="liquid-background relative min-h-dvh overflow-x-hidden bg-background text-foreground transition-colors duration-300"
 			style={shellStyle}
 		>
@@ -332,19 +389,23 @@ export function AppShell() {
 			<main
 				data-slot="app-main"
 				className={
-					hasMessages
+					hasConversationView
 						? 'relative z-10 flex min-h-dvh w-full flex-col px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pt-20 motion-reduce:transition-none'
 						: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pb-14 desktop:pt-20 motion-reduce:transition-none'
 				}
 			>
-				{hasMessages ? (
+				{hasConversationView ? (
 					<div className="animate-liquid-enter mx-auto flex w-full max-w-4xl flex-1 flex-col">
-						<ChatThread
-							error={error}
-							isLoading={isLoading}
-							messages={messages}
-							onRetry={retryLastMessage}
-						/>
+						{isOpeningConversation ? (
+							<ChatThreadSkeleton />
+						) : (
+							<ChatThread
+								error={error}
+								isLoading={isLoading}
+								messages={messages}
+								onRetry={retryLastMessage}
+							/>
+						)}
 					</div>
 				) : (
 					<section
@@ -373,9 +434,9 @@ export function AppShell() {
 					</section>
 				)}
 			</main>
-			{hasMessages ? (
+			{hasConversationView ? (
 				<ChatComposer
-					disabled={isLoading}
+					disabled={isLoading || isOpeningConversation}
 					modelLabel="Flash"
 					placement="dock"
 					onSubmit={submitMessage}

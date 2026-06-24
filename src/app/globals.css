@@ -140,6 +140,22 @@ select {
 		mask-image: linear-gradient(to bottom, black, transparent 82%);
 	}
 
+	.liquid-background[data-state="chat"] {
+		--background: #0f0f0f;
+		--foreground: oklch(98% 0.004 255);
+		--foreground-subtle: oklch(88% 0.006 255);
+		--muted-foreground: oklch(76% 0.008 255);
+		--surface: oklch(15% 0.006 255 / 72%);
+		--surface-raised: oklch(18% 0.006 255 / 86%);
+		background: #0f0f0f;
+		color: var(--foreground);
+	}
+
+	.liquid-background[data-state="chat"]::before {
+		background: none;
+		opacity: 0;
+	}
+
 	.glass-panel {
 		position: relative;
 		border: 1px solid var(--glass-border);

@@ -15,23 +15,23 @@ export function ChatMessage({ message }: ChatMessageProps) {
 			data-role={message.role}
 			className={`animate-liquid-enter flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
 		>
-			{isUser ? null : (
+			{/* {isUser ? null : (
 				<span
 					data-slot="assistant-avatar"
-					className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-foreground shadow-glass-soft"
+					className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-white/6 text-white shadow-glass-soft"
 				>
 					<Sparkles
 						aria-hidden="true"
 						className="size-4"
 					/>
 				</span>
-			)}
+			)} */}
 			<div
 				data-slot="message-bubble"
 				className={`max-w-[86%] whitespace-pre-wrap rounded-[1.35rem] px-4 py-3 text-sm leading-6 transition-shadow duration-300 desktop:max-w-[78%] ${
 					isUser
-						? 'bg-[#2f3337] text-foreground shadow-glass-soft'
-						: 'bg-transparent text-foreground'
+						? 'bg-[#2b2b2b] text-white shadow-glass-soft'
+						: 'bg-transparent text-white'
 				}`}
 			>
 				{message.content}

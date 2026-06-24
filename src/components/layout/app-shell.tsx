@@ -196,7 +196,7 @@ export function AppShell() {
 		<div
 			data-slot="app-shell"
 			data-state={hasMessages ? 'chat' : 'empty'}
-			className="liquid-background relative min-h-dvh overflow-x-hidden bg-background text-foreground"
+			className="liquid-background relative min-h-dvh overflow-x-hidden bg-background text-foreground transition-colors duration-300"
 			style={shellStyle}
 		>
 			<Sidebar

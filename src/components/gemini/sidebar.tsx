@@ -16,8 +16,8 @@ import {
 import { useEffect, useRef, type ComponentProps } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { twMerge } from 'tailwind-merge'
+import { AuthButton } from '@/components/auth/auth-button'
 import { GeminiMark } from '@/components/gemini/gemini-mark'
-import { Avatar } from '@/components/ui/avatar'
 import { IconButton } from '@/components/ui/icon-button'
 
 export interface SidebarProps {
@@ -264,35 +264,7 @@ function SidebarContent({ onNewConversation }: { onNewConversation?: () => void 
 function SidebarFooter() {
 	return (
 		<div className="sidebar-liquid-footer flex h-18 shrink-0 items-center gap-3 px-3">
-			<Avatar
-				name="Euller Gomes"
-				size="md"
-				variant="glass"
-				aria-label="Euller Gomes"
-			/>
-
-			<div className="min-w-0 flex-1">
-				<p className="truncate text-sm font-semibold text-foreground">
-					Euller Gomes
-				</p>
-
-				<p className="text-xs font-medium text-muted-foreground">
-					Pro
-				</p>
-			</div>
-
-			<div className="relative">
-				<IconButton
-					aria-label="Configurações"
-					variant="ghost"
-					size="lg"
-					className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
-				>
-					<Settings aria-hidden="true" />
-				</IconButton>
-
-				<span className="absolute right-2 top-2 size-2.5 rounded-full bg-gemini-blue shadow-[0_0_14px_rgba(64,156,255,0.95)]" />
-			</div>
+			<AuthButton placement="sidebar" />
 		</div>
 	)
 }

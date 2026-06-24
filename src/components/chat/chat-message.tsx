@@ -1,4 +1,3 @@
-import { Sparkles } from 'lucide-react'
 import { Avatar } from '@/components/ui/avatar'
 import type { ChatMessage as ChatMessageType } from '@/types/chat'
 

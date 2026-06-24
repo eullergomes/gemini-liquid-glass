@@ -1,4 +1,5 @@
 import { ChevronDown, Menu } from 'lucide-react'
+import { AuthButton } from '@/components/auth/auth-button'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
 
@@ -60,13 +61,7 @@ export function GeminiHeader({
 					</span>
 				))}
 			</nav>
-			<Button
-				variant="primary"
-				size="md"
-				className="h-11 rounded-full border-transparent px-5 text-sm font-semibold shadow-none desktop:ml-6 desktop:h-12 desktop:px-6 desktop:text-base"
-			>
-				Fazer login
-			</Button>
+			<AuthButton />
 		</header>
 	)
 }

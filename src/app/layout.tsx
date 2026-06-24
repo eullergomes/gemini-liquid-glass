@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Google_Sans_Flex } from 'next/font/google'
 import type { ReactNode } from 'react'
+import { AuthSessionProvider } from '@/components/auth/auth-session-provider'
 import './globals.css'
 
 const googleSansFlex = Google_Sans_Flex({
@@ -30,7 +31,9 @@ export default function RootLayout({
 			lang="pt-BR"
 			className={`${googleSansFlex.className} h-full antialiased`}
 		>
-			<body className="flex min-h-full flex-col">{children}</body>
+			<body className="flex min-h-full flex-col">
+				<AuthSessionProvider>{children}</AuthSessionProvider>
+			</body>
 		</html>
 	)
 }

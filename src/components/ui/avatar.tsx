@@ -1,7 +1,8 @@
+'use client'
+
 import { tv, type VariantProps } from 'tailwind-variants'
 import { twMerge } from 'tailwind-merge'
-import Image from 'next/image'
-import type { ComponentProps } from 'react'
+import { useState, type ComponentProps } from 'react'
 
 export const avatarVariants = tv({
 	base: [
@@ -57,8 +58,10 @@ export function Avatar({
 	variant,
 	...props
 }: AvatarProps) {
+	const [hasImageError, setHasImageError] = useState(false)
 	const fallback = children ?? getInitials(name)
 	const ariaLabel = props['aria-label'] ?? alt ?? name
+	const shouldShowImage = Boolean(src && !hasImageError)
 
 	return (
 		<div
@@ -68,14 +71,15 @@ export function Avatar({
 			className={twMerge(avatarVariants({ size, variant }), className)}
 			{...props}
 		>
-			{src ? (
-				<Image
+			{shouldShowImage ? (
+				// eslint-disable-next-line @next/next/no-img-element
+				<img
 					data-slot="avatar-image"
-					src={src}
-					alt={alt ?? name ?? ''}
-					width={48}
-					height={48}
-					unoptimized
+					src={src ?? ''}
+					alt=""
+					aria-hidden="true"
+					referrerPolicy="no-referrer"
+					onError={() => setHasImageError(true)}
 				/>
 			) : (
 				<span

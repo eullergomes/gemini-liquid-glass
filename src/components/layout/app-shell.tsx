@@ -16,7 +16,7 @@ import type {
 	ConversationSummary,
 } from '@/types/chat'
 
-const modelLabel = 'Gemini 3.1 Flash Lite'
+const modelLabel = 'Gemini 3.1 Flash'
 const heroTitle = 'Conheça o Gemini, seu assistente pessoal de IA com um visual Liquid Glass'
 const genericErrorMessage = 'Não consegui responder agora. Confira a configuração da API e tente novamente.'
 const friendlyErrorPrefixes = [

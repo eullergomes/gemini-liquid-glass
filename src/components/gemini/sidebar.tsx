@@ -13,19 +13,27 @@ import {
 	Settings,
 	X,
 } from 'lucide-react'
-import { useEffect, useRef, type ComponentProps } from 'react'
+import { useEffect, useRef, useState, type ComponentProps } from 'react'
+import { createPortal } from 'react-dom'
 import type { LucideIcon } from 'lucide-react'
 import { twMerge } from 'tailwind-merge'
 import { AuthButton } from '@/components/auth/auth-button'
 import { GeminiMark } from '@/components/gemini/gemini-mark'
+import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
 import type { ConversationSummary } from '@/types/chat'
+
+interface MenuPosition {
+	left: number
+	top: number
+}
 
 export interface SidebarProps {
 	activeConversationId?: null | string
 	conversations?: ConversationSummary[]
 	desktopOpen?: boolean
 	isLoadingConversations?: boolean
+	onConversationDelete?: (conversationId: string) => Promise<void>
 	onConversationSelect?: (conversationId: string) => void
 	onDesktopOpenChange?: (open: boolean) => void
 	onNewConversation?: () => void
@@ -109,29 +117,220 @@ function SectionTitle({ children, collapsible = false }: SectionTitleProps) {
 function RecentItem({
 	active = false,
 	children,
+	conversationId,
+	onDelete,
 	onClick,
 }: {
 	active?: boolean
 	children: string
+	conversationId: string
+	onDelete?: (conversationId: string) => Promise<void>
 	onClick?: () => void
 }) {
+	const [isDeleting, setIsDeleting] = useState(false)
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null)
+	const menuButtonRef = useRef<HTMLButtonElement>(null)
+	const menuRef = useRef<HTMLDivElement>(null)
+	const dialogTitleId = `delete-conversation-title-${conversationId}`
+	const dialogDescriptionId = `delete-conversation-description-${conversationId}`
+
+	useEffect(() => {
+		if (!isMenuOpen) {
+			return
+		}
+
+		function updateMenuPosition() {
+			const rect = menuButtonRef.current?.getBoundingClientRect()
+
+			if (!rect) {
+				return
+			}
+
+			const menuWidth = 128
+			const viewportPadding = 8
+			const nextLeft = Math.min(
+				Math.max(viewportPadding, rect.right - menuWidth),
+				window.innerWidth - menuWidth - viewportPadding,
+			)
+
+			setMenuPosition({
+				left: nextLeft,
+				top: rect.bottom + 6,
+			})
+		}
+
+		updateMenuPosition()
+
+		function handlePointerDown(event: PointerEvent) {
+			if (
+				event.target instanceof Node
+				&& !menuRef.current?.contains(event.target)
+			) {
+				setIsMenuOpen(false)
+			}
+		}
+
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === 'Escape') {
+				setIsMenuOpen(false)
+			}
+		}
+
+		window.addEventListener('pointerdown', handlePointerDown)
+		window.addEventListener('keydown', handleKeyDown)
+		window.addEventListener('resize', updateMenuPosition)
+		window.addEventListener('scroll', updateMenuPosition, true)
+
+		return () => {
+			window.removeEventListener('pointerdown', handlePointerDown)
+			window.removeEventListener('keydown', handleKeyDown)
+			window.removeEventListener('resize', updateMenuPosition)
+			window.removeEventListener('scroll', updateMenuPosition, true)
+		}
+	}, [isMenuOpen])
+
+	async function confirmDelete() {
+		if (!onDelete || isDeleting) {
+			return
+		}
+
+		setIsDeleting(true)
+
+		try {
+			await onDelete(conversationId)
+			setIsModalOpen(false)
+		} finally {
+			setIsDeleting(false)
+		}
+	}
+
+	const dropdown = isMenuOpen && menuPosition
+		? createPortal(
+			<div
+				ref={menuRef}
+				role="menu"
+				className="fixed z-[120] min-w-32 rounded-xl border border-white/10 bg-[#202124]/96 p-1 shadow-[0_18px_45px_rgba(0,0,0,0.38)] backdrop-blur-2xl"
+				style={{
+					left: menuPosition.left,
+					top: menuPosition.top,
+				}}
+			>
+				<button
+					type="button"
+					role="menuitem"
+					className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-semibold text-destructive transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+					onClick={() => {
+						setIsMenuOpen(false)
+						setIsModalOpen(true)
+					}}
+				>
+					Excluir
+				</button>
+			</div>,
+			document.body,
+		)
+		: null
+
+	const deleteModal = isModalOpen
+		? createPortal(
+			<div
+				data-slot="delete-conversation-modal"
+				className="fixed inset-0 z-[130] flex items-center justify-center px-4"
+			>
+				<button
+					type="button"
+					aria-label="Cancelar exclusão"
+					className="absolute inset-0 cursor-default bg-black/70 backdrop-blur-sm"
+					onClick={() => setIsModalOpen(false)}
+				/>
+				<div
+					role="dialog"
+					aria-modal="true"
+					aria-labelledby={dialogTitleId}
+					aria-describedby={dialogDescriptionId}
+					className="glass-elevated glass-inner-glow relative z-10 w-full max-w-[24rem] rounded-[1.5rem] border-white/12 bg-[#1f1f1f]/95 p-5 text-foreground shadow-[0_28px_90px_rgba(0,0,0,0.46)] backdrop-blur-2xl"
+				>
+					<h2
+						id={dialogTitleId}
+						className="text-lg font-semibold text-white"
+					>
+						Excluir conversa?
+					</h2>
+					<p
+						id={dialogDescriptionId}
+						className="mt-2 text-sm leading-6 text-foreground-subtle"
+					>
+						Essa ação não pode ser desfeita. A conversa “{children}” será removida do seu histórico.
+					</p>
+					<div className="mt-5 flex justify-end gap-2">
+						<Button
+							variant="ghost"
+							size="md"
+							className="rounded-full"
+							disabled={isDeleting}
+							onClick={() => setIsModalOpen(false)}
+						>
+							Cancelar
+						</Button>
+						<Button
+							variant="destructive"
+							size="md"
+							className="rounded-full"
+							disabled={isDeleting}
+							onClick={() => {
+								void confirmDelete()
+							}}
+						>
+							{isDeleting ? 'Excluindo...' : 'Excluir'}
+						</Button>
+					</div>
+				</div>
+			</div>,
+			document.body,
+		)
+		: null
+
 	return (
-		<button
-			type="button"
+		<div
 			data-slot="recent-item"
 			data-active={active ? '' : undefined}
-			className="sidebar-liquid-button group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-			onClick={onClick}
+			className="sidebar-liquid-button group relative focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
 		>
-			<span className="sidebar-liquid-label">
+			<button
+				type="button"
+				className="sidebar-liquid-label text-left focus-visible:outline-none"
+				onClick={onClick}
+			>
 				{children}
-			</span>
+			</button>
 
-			<MoreVertical
-				aria-hidden="true"
-				className="sidebar-liquid-icon size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-			/>
-		</button>
+			<div
+				className="relative z-10 shrink-0"
+			>
+				<IconButton
+					ref={menuButtonRef}
+					aria-label={`Abrir opções de ${children}`}
+					aria-expanded={isMenuOpen}
+					aria-haspopup="menu"
+					variant="ghost"
+					size="sm"
+					className="size-8 text-muted-foreground opacity-0 hover:bg-white/10 hover:text-foreground group-hover:opacity-100 group-focus-within:opacity-100 data-[open]:opacity-100"
+					data-open={isMenuOpen ? '' : undefined}
+					onClick={(event) => {
+						event.stopPropagation()
+						setIsMenuOpen((current) => !current)
+					}}
+				>
+					<MoreVertical aria-hidden="true" />
+				</IconButton>
+
+				{dropdown}
+			</div>
+
+			{deleteModal}
+		</div>
 	)
 }
 
@@ -224,12 +423,14 @@ function SidebarContent({
 	activeConversationId,
 	conversations = [],
 	isLoadingConversations = false,
+	onConversationDelete,
 	onConversationSelect,
 	onNewConversation,
 }: {
 	activeConversationId?: null | string
 	conversations?: ConversationSummary[]
 	isLoadingConversations?: boolean
+	onConversationDelete?: (conversationId: string) => Promise<void>
 	onConversationSelect?: (conversationId: string) => void
 	onNewConversation?: () => void
 }) {
@@ -281,7 +482,9 @@ function SidebarContent({
 						conversations.map((conversation) => (
 							<RecentItem
 								active={conversation.id === activeConversationId}
+								conversationId={conversation.id}
 								key={conversation.id}
+								onDelete={onConversationDelete}
 								onClick={() => onConversationSelect?.(conversation.id)}
 							>
 								{conversation.title}
@@ -309,6 +512,7 @@ export function Sidebar({
 	conversations,
 	desktopOpen = true,
 	isLoadingConversations,
+	onConversationDelete,
 	onConversationSelect,
 	onDesktopOpenChange,
 	onNewConversation,
@@ -423,6 +627,7 @@ export function Sidebar({
 							activeConversationId={activeConversationId}
 							conversations={conversations}
 							isLoadingConversations={isLoadingConversations}
+							onConversationDelete={onConversationDelete}
 							onConversationSelect={onConversationSelect}
 							onNewConversation={startNewConversation}
 						/>
@@ -494,6 +699,7 @@ export function Sidebar({
 						activeConversationId={activeConversationId}
 						conversations={conversations}
 						isLoadingConversations={isLoadingConversations}
+						onConversationDelete={onConversationDelete}
 						onConversationSelect={onConversationSelect}
 						onNewConversation={startNewConversation}
 					/>

@@ -111,6 +111,20 @@ export async function listConversationMessages(
 	}
 }
 
+export async function deleteUserConversation(
+	conversationId: string,
+	userId: string,
+) {
+	const result = await prisma.conversation.deleteMany({
+		where: {
+			id: conversationId,
+			userId,
+		},
+	})
+
+	return result.count > 0
+}
+
 export async function persistConversationTurn({
 	assistantContent,
 	conversationId,

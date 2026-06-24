@@ -42,6 +42,11 @@ interface StoredConversationResponse {
 	title: string
 }
 
+interface ToastState {
+	message: string
+	type: 'error' | 'success'
+}
+
 export interface AppShellProps {
 	initialConversationId?: string
 }
@@ -103,6 +108,7 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 	const [isOpeningConversation, setIsOpeningConversation] = useState(Boolean(initialConversationId))
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 	const [messages, setMessages] = useState<ChatMessage[]>([])
+	const [toast, setToast] = useState<ToastState | null>(null)
 	const hasMessages = messages.length > 0
 	const hasConversationView = hasMessages || Boolean(activeConversationId) || isOpeningConversation
 	const canUseSavedConversations = status === 'authenticated'
@@ -208,6 +214,18 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 
 		return () => window.clearTimeout(refreshSessionState)
 	}, [initialConversationId, loadConversation, refreshConversations, status, userId])
+
+	useEffect(() => {
+		if (!toast) {
+			return
+		}
+
+		const toastTimeout = window.setTimeout(() => {
+			setToast(null)
+		}, 4200)
+
+		return () => window.clearTimeout(toastTimeout)
+	}, [toast])
 
 	const openSidebar = useCallback(() => {
 		setIsSidebarOpen(true)
@@ -363,6 +381,42 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 		void loadConversation(conversationId)
 	}, [isLoading, isOpeningConversation, loadConversation, router])
 
+	const deleteConversation = useCallback(async (conversationId: string) => {
+		try {
+			const response = await fetch(`/api/conversations/${encodeURIComponent(conversationId)}`, {
+				method: 'DELETE',
+			})
+
+			if (!response.ok) {
+				throw new Error(await readErrorMessage(response))
+			}
+
+			setConversations((currentConversations) => currentConversations.filter((conversation) => (
+				conversation.id !== conversationId
+			)))
+
+			if (conversationId === activeConversationId) {
+				setActiveConversationId(null)
+				loadedConversationRef.current = null
+				setError(null)
+				setMessages([])
+				setIsLoading(false)
+				setIsOpeningConversation(false)
+				router.push('/', { scroll: false })
+			}
+
+			setToast({
+				message: 'Conversa excluída com sucesso.',
+				type: 'success',
+			})
+		} catch (caughtError) {
+			setToast({
+				message: getFriendlyErrorMessage(caughtError),
+				type: 'error',
+			})
+		}
+	}, [activeConversationId, router])
+
 	return (
 		<div
 			data-slot="app-shell"
@@ -375,6 +429,7 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 				conversations={canUseSavedConversations ? conversations : []}
 				desktopOpen={isDesktopSidebarOpen}
 				isLoadingConversations={status === 'loading' || isOpeningConversation}
+				onConversationDelete={deleteConversation}
 				onConversationSelect={openConversation}
 				onDesktopOpenChange={setIsDesktopSidebarOpen}
 				onNewConversation={clearConversation}
@@ -441,6 +496,17 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 					placement="dock"
 					onSubmit={submitMessage}
 				/>
+			) : null}
+			{toast ? (
+				<div
+					role="status"
+					aria-live="polite"
+					data-slot="app-toast"
+					data-type={toast.type}
+					className="glass-elevated fixed bottom-24 left-4 right-4 z-[80] mx-auto max-w-sm rounded-2xl border-white/12 bg-[#202124]/95 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_55px_rgba(0,0,0,0.4)] backdrop-blur-2xl desktop:bottom-8 desktop:left-auto desktop:right-8 desktop:mx-0"
+				>
+					{toast.message}
+				</div>
 			) : null}
 		</div>
 	)

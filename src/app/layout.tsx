@@ -13,7 +13,7 @@ const googleSansFlex = Google_Sans_Flex({
 
 export const metadata: Metadata = {
 	title: 'Gemini Liquid Glass',
-	description: 'Um assistente de IA baseado no Gemini 2.5 Flash, projetado para fornecer respostas úteis, objetivas e amigáveis em português do Brasil.',
+	description: 'Um assistente de IA baseado no Gemini 3.1 Flash Lite, projetado para fornecer respostas úteis, objetivas e amigáveis em português do Brasil.',
 	icons: {
 		icon: '/assets/images/gemini-liquid-glass-logo.webp',
 		shortcut: '/assets/images/gemini-liquid-glass-logo.webp',

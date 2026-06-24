@@ -16,7 +16,7 @@ import type {
 	ConversationSummary,
 } from '@/types/chat'
 
-const modelLabel = 'Gemini 2.5 Flash'
+const modelLabel = 'Gemini 3.1 Flash Lite'
 const heroTitle = 'Conheça o Gemini, seu assistente pessoal de IA com um visual Liquid Glass'
 const genericErrorMessage = 'Não consegui responder agora. Confira a configuração da API e tente novamente.'
 const friendlyErrorPrefixes = [
@@ -309,9 +309,15 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 
 			assistantContent += decoder.decode()
 
+			const finalAssistantContent = assistantContent.trim()
+
+			if (!finalAssistantContent) {
+				throw new Error('A resposta da IA veio vazia. Isso pode acontecer quando o limite da API foi atingido ou o modelo ficou indisponível. Tente novamente em instantes.')
+			}
+
 			setMessages((currentMessages) => currentMessages.map((message) => (
 				message.id === assistantMessageId
-					? { ...message, content: assistantContent.trim() || 'Não recebi conteúdo da IA.' }
+					? { ...message, content: finalAssistantContent }
 					: message
 			)))
 

@@ -81,7 +81,7 @@ export async function POST(request: Request): Promise<Response> {
 	try {
 		const result = streamText({
 			model: getGeminiModel(),
-			maxRetries: 1,
+			maxRetries: 0,
 			system: CHAT_SYSTEM_PROMPT,
 			messages: toModelMessages(parsedPayload.data.messages),
 			async onFinish(event) {

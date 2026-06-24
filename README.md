@@ -71,7 +71,7 @@ Preencha as variaveis no `.env`.
 
 ```txt
 GOOGLE_GENERATIVE_AI_API_KEY=
-GOOGLE_GENERATIVE_AI_MODEL=gemini-2.5-flash-lite
+GOOGLE_GENERATIVE_AI_MODEL=gemini-3.1-flash-lite
 
 AUTH_SECRET=
 AUTH_URL=http://localhost:3000
@@ -93,7 +93,7 @@ GOOGLE_GENERATIVE_AI_API_KEY=
 O modelo pode ser ajustado em:
 
 ```txt
-GOOGLE_GENERATIVE_AI_MODEL=gemini-2.5-flash-lite
+GOOGLE_GENERATIVE_AI_MODEL=gemini-3.1-flash-lite
 ```
 
 A chave e usada somente em rotas server-side.

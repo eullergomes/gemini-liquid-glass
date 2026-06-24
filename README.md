@@ -1,49 +1,147 @@
-# Gemini Liquid Glass Web App
+# Gemini Liquid Glass
 
-Web app mobile first inspirado na experiência do Gemini, com visual Liquid Glass e chat funcional integrado à Gemini API por uma rota server-side do Next.js.
+Web app inspirado na experiencia do Gemini, com interface Liquid Glass, chat em streaming com Gemini API, login com Google via Auth.js e persistencia de conversas usando Prisma + Supabase Postgres.
 
-O objetivo do projeto é entregar uma interface polida para teste técnico: responsiva, acessível, com arquitetura simples, tokens visuais consistentes e sem exposição de chaves no client.
+O objetivo do projeto e entregar uma experiencia de chat polida, responsiva e funcional, mantendo a API key sempre no servidor e preparando a base para historico de conversas por usuario.
+
+## Preview
+
+### Desktop
+
+![Tela desktop do Gemini Liquid Glass](public/assets/images/desktop.webp)
+
+### Mobile
+
+<div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+	<img src="public/assets/images/mobile.webp" alt="Tela mobile do Gemini Liquid Glass" width="260" />
+	<img src="public/assets/images/mobile-sidebar-open.webp" alt="Tela mobile com sidebar aberta" width="260" />
+</div>
 
 ## Stack
 
-- Next.js com App Router
+- Next.js 16 com App Router
 - React 19
 - TypeScript
 - Tailwind CSS v4
-- Tailwind Variants
-- Tailwind Merge
-- Lucide React
 - Vercel AI SDK
 - Google Gemini API via `@ai-sdk/google`
-- Zod para validação do payload da API
+- Auth.js / NextAuth
+- Prisma
+- Supabase Postgres
+- React Markdown, Remark GFM e Rehype Sanitize
+- Lucide React
+- Zod
 
-## Como Rodar Localmente
+## Features
 
-Instale as dependências:
+- Interface Gemini-like com acabamento Liquid Glass.
+- Layout responsivo com sidebar persistente no desktop e drawer no mobile.
+- Composer com autosize, envio por `Enter` e quebra de linha com `Shift+Enter`.
+- Chat server-side com streaming quando a API permite.
+- Tratamento visual para loading, erro, retry e ausencia de API key.
+- Login com Google sem bloquear o uso anonimo do chat.
+- Persistencia de conversas para usuarios autenticados.
+- Rotas de conversa em `/<conversationId>`.
+- Historico no sidebar com abertura e exclusao de conversas.
+- Renderizacao segura de Markdown gerado pela IA.
+
+## Instalacao
+
+Instale as dependencias:
 
 ```bash
 npm install
 ```
 
-Crie o arquivo de ambiente local a partir do exemplo:
+Crie o arquivo de ambiente local:
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-No Windows PowerShell, se preferir:
+No Windows PowerShell:
 
 ```powershell
-Copy-Item .env.example .env.local
+Copy-Item .env.example .env
 ```
 
-Preencha a variável no `.env.local`:
+Preencha as variaveis no `.env`.
+
+## Variaveis de Ambiente
+
+```txt
+GOOGLE_GENERATIVE_AI_API_KEY=
+GOOGLE_GENERATIVE_AI_MODEL=gemini-2.5-flash-lite
+
+AUTH_SECRET=
+AUTH_URL=http://localhost:3000
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
+
+DATABASE_URL=
+DIRECT_URL=
+```
+
+### Gemini API
+
+Crie uma chave no Google AI Studio e preencha:
 
 ```txt
 GOOGLE_GENERATIVE_AI_API_KEY=
 ```
 
-Substitua o valor vazio pela sua chave gerada no Google AI Studio.
+O modelo pode ser ajustado em:
+
+```txt
+GOOGLE_GENERATIVE_AI_MODEL=gemini-2.5-flash-lite
+```
+
+A chave e usada somente em rotas server-side.
+
+### Google Login
+
+Para habilitar o login, crie credenciais OAuth no Google Cloud Console e configure:
+
+```txt
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
+AUTH_SECRET=
+AUTH_URL=http://localhost:3000
+```
+
+Em desenvolvimento, o callback OAuth deve apontar para:
+
+```txt
+http://localhost:3000/api/auth/callback/google
+```
+
+Voce pode gerar `AUTH_SECRET` com:
+
+```bash
+npx auth secret
+```
+
+Se o comando gerar outro nome de variavel, copie apenas o valor e coloque em `AUTH_SECRET`.
+
+### Banco de Dados
+
+O projeto usa Prisma com Supabase Postgres. Configure:
+
+```txt
+DATABASE_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:5432/postgres"
+```
+
+Use `DATABASE_URL` para o runtime com pooler em transaction mode e `DIRECT_URL` para migrations.
+
+Depois de preencher as URLs, rode:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+## Rodando Localmente
 
 Inicie o servidor de desenvolvimento:
 
@@ -51,45 +149,11 @@ Inicie o servidor de desenvolvimento:
 npm run dev
 ```
 
-Abra `http://localhost:3000`.
-
-## Variáveis de Ambiente
-
-| Variável | Obrigatória | Descrição |
-| --- | --- | --- |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Sim | Chave da Google AI Studio usada somente na rota server-side `src/app/api/chat/route.ts`. |
-
-O arquivo `.env.example` não contém valores reais. Nunca coloque a chave diretamente em componentes client-side.
-
-## Integração com IA
-
-O chat envia mensagens para `src/app/api/chat/route.ts`, que roda no servidor. A rota valida o payload com Zod, verifica se `GOOGLE_GENERATIVE_AI_API_KEY` está configurada e usa o Vercel AI SDK para gerar resposta em streaming.
-
-O modelo configurado em `src/lib/ai.ts` é:
+Abra:
 
 ```txt
-gemini-2.5-flash
+http://localhost:3000
 ```
-
-O prompt de sistema orienta o assistente a responder em português do Brasil por padrão. Quando a chave está ausente ou a API falha, a UI exibe uma mensagem amigável e opção de tentar novamente.
-
-## Decisões de Design
-
-- A UI é original, mas inspirada em padrões de interação do Gemini.
-- O visual Liquid Glass usa superfícies translúcidas, blur, brilho interno, sombras suaves e gradientes ambientais.
-- Os componentes reutilizáveis usam `data-slot`, `tailwind-variants` e `tailwind-merge`.
-- Botões de ícone possuem `aria-label`.
-- Estados de vazio, loading, erro e conversa foram implementados.
-- Animações são sutis e respeitam `prefers-reduced-motion`.
-
-## Estratégia Responsiva
-
-A implementação é mobile first.
-
-- De `0px` até `959px`, a experiência mantém a composição mobile/tablet com header superior, drawer lateral e composer fixo no rodapé.
-- A partir de `960px`, o breakpoint customizado `desktop` ativa uma sidebar persistente, desloca o conteúdo principal e centraliza o composer em uma largura confortável.
-- A aplicação não usa `max-w-[959px]` como limite global.
-- Larguras máximas aparecem apenas em regiões internas, como conteúdo principal e composer, para preservar legibilidade.
 
 ## Scripts
 
@@ -100,39 +164,35 @@ npm run build
 npm run start
 ```
 
-Observação: não há script `typecheck` separado neste momento; a checagem TypeScript roda durante `npm run build`.
-
-## Checklist de Features
-
-- [x] Shell principal mobile first
-- [x] Header inspirado no Gemini
-- [x] Drawer lateral com fechamento por Escape e clique fora
-- [x] Cards de sugestões
-- [x] Composer fixo no rodapé
-- [x] Estado vazio
-- [x] Estado de conversa
-- [x] Estado de loading
-- [x] Estado de erro com retry
-- [x] Chat server-side com Gemini API
-- [x] Streaming de resposta quando disponível
-- [x] `.env.example` sem segredo real
-- [x] Breakpoint desktop em `960px`
-- [x] Polimento visual Liquid Glass
-- [x] Revisão de acessibilidade e responsividade nos tamanhos principais
-
-## Validação Recomendada
-
-Antes de entregar ou fazer deploy, rode:
+Antes de abrir um PR ou fazer deploy, rode:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-Também vale revisar manualmente as larguras:
+## Estrutura Principal
+
+```txt
+src/app/api/chat/route.ts                    Rota server-side do chat
+src/app/api/conversations/route.ts           Lista conversas do usuario
+src/app/api/conversations/[conversationId]   Historico/exclusao de conversa
+src/app/[conversationId]/page.tsx            Pagina de conversa persistida
+src/components/layout/app-shell.tsx          Shell principal do app
+src/components/gemini/sidebar.tsx            Sidebar desktop/mobile
+src/components/chat/chat-composer.tsx        Composer do chat
+src/components/chat/chat-message.tsx         Mensagens e Markdown
+src/auth.ts                                  Configuracao Auth.js
+src/lib/prisma.ts                            Prisma Client
+src/lib/conversations.ts                     Acesso a conversas persistidas
+```
+
+## Validacao Responsiva
+
+Larguras recomendadas para teste manual:
 
 ```txt
 360px, 375px, 430px, 768px, 959px, 960px, 1280px
 ```
 
-Verifique se não há overflow horizontal, se o composer permanece visível, se o foco é perceptível via teclado e se o drawer mantém navegação acessível.
+Verifique se nao ha overflow horizontal, se o composer permanece visivel, se a sidebar/drawer nao cobre a conversa indevidamente e se o foco por teclado continua perceptivel.

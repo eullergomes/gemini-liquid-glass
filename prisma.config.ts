@@ -14,11 +14,9 @@ for (const envFile of ['.env', '.env.local']) {
 	}
 }
 
-const migrationUrl = process.env.DIRECT_URL
-
-if (!migrationUrl) {
-	throw new Error('DIRECT_URL is required for Prisma migrations. Use the Supabase session-mode pooler URL in .env or .env.local.')
-}
+const datasourceUrl = process.env.DIRECT_URL
+	?? process.env.DATABASE_URL
+	?? 'postgresql://postgres:postgres@localhost:5432/postgres'
 
 export default defineConfig({
 	schema: 'prisma/schema.prisma',
@@ -26,6 +24,6 @@ export default defineConfig({
 		path: 'prisma/migrations',
 	},
 	datasource: {
-		url: migrationUrl,
+		url: datasourceUrl,
 	},
 })

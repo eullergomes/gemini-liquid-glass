@@ -28,7 +28,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 			)} */}
 			<div
 				data-slot="message-bubble"
-				className={`max-w-[86%] whitespace-pre-wrap rounded-[1.35rem] px-4 py-3 text-sm leading-6 transition-shadow duration-300 desktop:max-w-[78%] ${
+				className={`max-w-[86%] whitespace-pre-wrap rounded-[1.35rem] px-4 py-3 text-sm leading-6 transition-shadow duration-300 desktop:max-w-[90%] ${
 					isUser
 						? 'bg-[#2b2b2b] text-white shadow-glass-soft'
 						: 'bg-transparent text-white'

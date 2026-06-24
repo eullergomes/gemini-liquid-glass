@@ -729,12 +729,7 @@ export function Sidebar({
 					aria-labelledby="gemini-sidebar-title"
 					data-slot="sidebar"
 					data-open={open ? '' : undefined}
-					className="sidebar-liquid-shell fixed inset-y-0 flex w-[min(25rem,calc(90vw-2rem))] flex-col rounded-r-[1.75rem] border-r transition-[left] duration-300 ease-out motion-reduce:transition-none"
-					style={{
-						left: open ? '0' : '-25rem',
-						transform: 'none',
-						translate: 'none',
-					}}
+					className={`sidebar-liquid-shell fixed inset-y-0 left-0 flex w-[min(25rem,calc(90vw-2rem))] transform-gpu flex-col rounded-r-[1.75rem] border-r transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none ${open ? 'translate-x-0' : '-translate-x-full'}`}
 				>
 					<SidebarHeader
 						isMobile

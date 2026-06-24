@@ -94,6 +94,10 @@ function getConversationPath(conversationId: string) {
 	return `/${encodeURIComponent(conversationId)}`
 }
 
+function replaceCurrentConversationPath(conversationId: string) {
+	window.history.replaceState(null, '', getConversationPath(conversationId))
+}
+
 export function AppShell({ initialConversationId }: AppShellProps) {
 	const router = useRouter()
 	const { data: session, status } = useSession()
@@ -260,10 +264,11 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 
 			if (responseConversationId) {
 				nextConversationId = responseConversationId
+				loadedConversationRef.current = responseConversationId
 				setActiveConversationId(responseConversationId)
 
 				if (canUseSavedConversations && responseConversationId !== activeConversationId) {
-					router.replace(getConversationPath(responseConversationId), { scroll: false })
+					replaceCurrentConversationPath(responseConversationId)
 				}
 			}
 
@@ -324,7 +329,7 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [activeConversationId, canUseSavedConversations, refreshConversations, router])
+	}, [activeConversationId, canUseSavedConversations, refreshConversations])
 
 	const submitMessage = useCallback((content: string) => {
 		const trimmedContent = content.trim()

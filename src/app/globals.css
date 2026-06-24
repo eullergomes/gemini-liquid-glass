@@ -763,6 +763,30 @@ select {
 	-webkit-backdrop-filter: blur(10px);
 }
 
+@media (max-width: 59.999rem) {
+	.sidebar-liquid-shell {
+		backdrop-filter: blur(18px) saturate(1.18);
+		-webkit-backdrop-filter: blur(18px) saturate(1.18);
+		box-shadow:
+			inset 1px 0 0 oklch(100% 0 0 / 10%),
+			inset -1px 0 0 oklch(100% 0 0 / 4%),
+			inset 0 1px 0 oklch(100% 0 0 / 10%),
+			18px 0 46px oklch(0% 0 0 / 36%);
+	}
+
+	.sidebar-liquid-overlay {
+		background:
+			radial-gradient(
+				circle at 20% 18%,
+				oklch(64% 0.18 252 / 10%),
+				transparent 22rem
+			),
+			oklch(0% 0 0 / 68%);
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+	}
+}
+
 .sidebar-liquid-scroll {
 	scrollbar-width: thin;
 	scrollbar-color: oklch(100% 0 0 / 16%) transparent;

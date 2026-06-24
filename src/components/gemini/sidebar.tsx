@@ -76,20 +76,22 @@ function SidebarButton({
 			data-slot="sidebar-button"
 			data-active={active ? '' : undefined}
 			className={twMerge(
-				'group flex min-h-10 w-full items-center gap-3 rounded-full px-4 text-left text-sm font-semibold text-foreground transition-all duration-200',
-				'hover:bg-white/7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer',
-				active ? 'bg-black/22 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : '',
+				'sidebar-liquid-button group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 				className,
 			)}
 			{...props}
 		>
 			<Icon
 				aria-hidden="true"
-				className="size-5 shrink-0 text-foreground"
+				className="sidebar-liquid-icon size-5 shrink-0"
 			/>
-			<span className="min-w-0 flex-1 truncate">{label}</span>
+
+			<span className="sidebar-liquid-label">
+				{label}
+			</span>
+
 			{badge ? (
-				<span className="rounded-full bg-white/14 px-2 py-0.5 text-xs font-medium text-foreground-subtle">
+				<span className="sidebar-liquid-badge">
 					{badge}
 				</span>
 			) : null}
@@ -99,12 +101,13 @@ function SidebarButton({
 
 function SectionTitle({ children, collapsible = false }: SectionTitleProps) {
 	return (
-		<div className="mt-7 flex h-7 items-center gap-1 px-4 text-sm font-medium text-muted-foreground">
+		<div className="mt-7 flex h-7 items-center gap-1 px-4 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground/85">
 			<span>{children}</span>
+
 			{collapsible ? (
 				<ChevronDown
 					aria-hidden="true"
-					className="size-4"
+					className="size-4 opacity-70"
 				/>
 			) : null}
 		</div>
@@ -116,12 +119,15 @@ function RecentItem({ children }: { children: string }) {
 		<button
 			type="button"
 			data-slot="recent-item"
-			className="group flex min-h-10 w-full items-center gap-2 rounded-full px-4 text-left text-sm font-semibold text-foreground transition-colors hover:bg-white/7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
+			className="sidebar-liquid-button group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 		>
-			<span className="min-w-0 flex-1 truncate">{children}</span>
+			<span className="sidebar-liquid-label">
+				{children}
+			</span>
+
 			<MoreVertical
 				aria-hidden="true"
-				className="size-4 shrink-0 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 cursor-pointer"
+				className="sidebar-liquid-icon size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
 			/>
 		</button>
 	)
@@ -143,7 +149,7 @@ function SidebarHeader({
 	return (
 		<div
 			className={twMerge(
-				'flex h-16 shrink-0 items-center gap-3',
+				'sidebar-liquid-layer flex h-16 shrink-0 items-center gap-3',
 				expanded ? 'justify-between px-5' : 'justify-center px-3',
 			)}
 		>
@@ -190,7 +196,7 @@ function SidebarHeader({
 					<span
 						role="tooltip"
 						className={twMerge(
-							'pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-white/70 bg-white px-4 py-2 text-sm font-medium text-[#202124] opacity-0 shadow-[0_12px_35px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-opacity duration-150 group-hover:opacity-100',
+							'pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-background/88 px-4 py-2 text-sm font-medium text-foreground opacity-0 shadow-[0_14px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl transition-opacity duration-150 group-hover:opacity-100',
 						)}
 					>
 						{tooltipLabel}
@@ -203,7 +209,7 @@ function SidebarHeader({
 
 function SidebarContent({ onNewConversation }: { onNewConversation?: () => void }) {
 	return (
-		<div className="flex min-h-0 flex-1 flex-col">
+		<div className="sidebar-liquid-layer flex min-h-0 flex-1 flex-col">
 			<div className="shrink-0 space-y-1 px-2 pb-3">
 				<SidebarButton
 					active
@@ -211,32 +217,40 @@ function SidebarContent({ onNewConversation }: { onNewConversation?: () => void 
 					label="Nova conversa"
 					onClick={onNewConversation}
 				/>
+
 				<SidebarButton
 					icon={Search}
 					label="Pesquisar conversas"
 				/>
+
 				<SidebarButton
 					badge="Novo"
 					icon={Image}
 					label="Imagens"
 				/>
+
 				<SidebarButton
 					icon={Clapperboard}
 					label="Vídeos"
 				/>
+
 				<SidebarButton
 					icon={Library}
 					label="Biblioteca"
 				/>
 			</div>
-			<div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
+			<div className="sidebar-liquid-scroll min-h-0 flex-1 overflow-y-auto px-2 pb-4">
 				<SectionTitle collapsible>Notebooks</SectionTitle>
+
 				<SidebarButton
 					icon={Plus}
 					label="Novo notebook"
 					className="mt-1"
 				/>
+
 				<SectionTitle collapsible>Recentes</SectionTitle>
+
 				<div className="mt-1 space-y-1">
 					{recentItems.map((item) => (
 						<RecentItem key={item}>{item}</RecentItem>
@@ -249,27 +263,35 @@ function SidebarContent({ onNewConversation }: { onNewConversation?: () => void 
 
 function SidebarFooter() {
 	return (
-		<div className="flex h-20 shrink-0 items-center gap-3 px-4">
+		<div className="sidebar-liquid-footer flex h-18 shrink-0 items-center gap-3 px-3">
 			<Avatar
 				name="Euller Gomes"
 				size="md"
 				variant="glass"
 				aria-label="Euller Gomes"
 			/>
+
 			<div className="min-w-0 flex-1">
-				<p className="truncate text-sm font-semibold text-foreground">Euller Gomes</p>
-				<p className="text-xs font-medium text-muted-foreground">Pro</p>
+				<p className="truncate text-sm font-semibold text-foreground">
+					Euller Gomes
+				</p>
+
+				<p className="text-xs font-medium text-muted-foreground">
+					Pro
+				</p>
 			</div>
+
 			<div className="relative">
 				<IconButton
 					aria-label="Configurações"
 					variant="ghost"
 					size="lg"
-					className="text-foreground hover:bg-white/10"
+					className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
 				>
 					<Settings aria-hidden="true" />
 				</IconButton>
-				<span className="absolute right-2 top-2 size-2.5 rounded-full bg-gemini-blue shadow-[0_0_12px_rgba(64,156,255,0.95)]" />
+
+				<span className="absolute right-2 top-2 size-2.5 rounded-full bg-gemini-blue shadow-[0_0_14px_rgba(64,156,255,0.95)]" />
 			</div>
 		</div>
 	)
@@ -375,7 +397,7 @@ export function Sidebar({
 				data-state={desktopOpen ? 'open' : 'closed'}
 				aria-labelledby="gemini-desktop-sidebar-title"
 				className={twMerge(
-					'fixed inset-y-0 left-0 z-20 hidden flex-col border-r border-white/6 bg-[#1f1f1f]/88 shadow-[24px_0_70px_rgba(0,0,0,0.22)] backdrop-blur-2xl transition-[width] duration-300 ease-out motion-reduce:transition-none desktop:flex',
+					'sidebar-liquid-shell fixed inset-y-0 left-0 z-20 hidden flex-col rounded-r-[1.75rem] border-r transition-[width] duration-300 ease-out motion-reduce:transition-none desktop:flex',
 					desktopOpen ? 'w-[22.5rem]' : 'w-16',
 				)}
 			>
@@ -426,7 +448,7 @@ export function Sidebar({
 					type="button"
 					aria-label="Fechar menu"
 					tabIndex={open ? 0 : -1}
-					className={`absolute inset-0 cursor-default bg-black/55 backdrop-blur-sm transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
+					className={`sidebar-liquid-overlay absolute inset-0 cursor-default transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'opacity-0'}`}
 					data-open={open ? '' : undefined}
 					onClick={closeSidebar}
 				/>
@@ -439,7 +461,7 @@ export function Sidebar({
 					aria-labelledby="gemini-sidebar-title"
 					data-slot="sidebar"
 					data-open={open ? '' : undefined}
-					className="fixed inset-y-0 flex w-[min(25rem,calc(90vw-2rem))] flex-col rounded-r-[1.45rem] border-r border-white/8 bg-[#1f1f1f]/92 shadow-[24px_0_70px_rgba(0,0,0,0.32)] backdrop-blur-2xl transition-[left] duration-300 ease-out motion-reduce:transition-none"
+					className="sidebar-liquid-shell fixed inset-y-0 flex w-[min(25rem,calc(90vw-2rem))] flex-col rounded-r-[1.75rem] border-r transition-[left] duration-300 ease-out motion-reduce:transition-none"
 					style={{
 						left: open ? '0' : '-25rem',
 						transform: 'none',

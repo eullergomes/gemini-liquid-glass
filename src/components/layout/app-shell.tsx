@@ -212,47 +212,49 @@ export function AppShell() {
 				onMenuOpen={openSidebar}
 			/>
 			<main
-				data-slot="app-main"
-				className={
-					hasMessages
-						? 'relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-36 pt-20 desktop:ml-[var(--sidebar-offset)] desktop:w-[calc(100%_-_var(--sidebar-offset))] desktop:max-w-none desktop:px-12 desktop:pt-20'
-						: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 desktop:ml-[var(--sidebar-offset)] desktop:w-[calc(100%_-_var(--sidebar-offset))] desktop:pb-14 desktop:pt-20'
-				}
+	data-slot="app-main"
+	className={
+		hasMessages
+			? 'relative z-10 flex min-h-dvh w-full flex-col px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pt-20 motion-reduce:transition-none'
+			: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pb-14 desktop:pt-20 motion-reduce:transition-none'
+	}
+>
+	{hasMessages ? (
+		<div className="animate-liquid-enter mx-auto flex w-full max-w-4xl flex-1 flex-col">
+			<ChatThread
+				error={error}
+				isLoading={isLoading}
+				messages={messages}
+				onRetry={retryLastMessage}
+			/>
+		</div>
+	) : (
+		<section
+			aria-labelledby="empty-state-title"
+			className="mx-auto flex w-full max-w-[53rem] flex-1 flex-col items-center justify-center gap-8 text-center desktop:gap-14"
+		>
+			<GeminiMark
+				size="lg"
+				className="desktop:hidden"
+				aria-label="Gemini"
+			/>
+
+			<h1
+				id="empty-state-title"
+				className="max-w-[22rem] text-balance text-[1.85rem] font-normal leading-[1.2] tracking-normal text-foreground desktop:max-w-[56rem] desktop:text-[3rem] desktop:leading-[1.15]"
 			>
-				{hasMessages ? (
-					<div className="animate-liquid-enter flex w-full flex-1 flex-col">
-						<ChatThread
-							error={error}
-							isLoading={isLoading}
-							messages={messages}
-							onRetry={retryLastMessage}
-						/>
-					</div>
-				) : (
-					<section
-						aria-labelledby="empty-state-title"
-						className="flex w-full max-w-[53rem] flex-1 flex-col items-center justify-center gap-8 text-center desktop:gap-14"
-					>
-						<GeminiMark
-							size="lg"
-							className="desktop:hidden"
-							aria-label="Gemini"
-						/>
-						<h1
-							id="empty-state-title"
-							className="max-w-[22rem] text-balance text-[1.85rem] font-normal leading-[1.2] tracking-normal text-foreground desktop:max-w-[56rem] desktop:text-[3rem] desktop:leading-[1.15]"
-						>
-							{heroTitle}
-						</h1>
-						<ChatComposer
-							disabled={isLoading}
-							modelLabel="Flash"
-							placement="hero"
-							onSubmit={submitMessage}
-						/>
-					</section>
-				)}
-			</main>
+				{heroTitle}
+			</h1>
+
+			<ChatComposer
+				disabled={isLoading}
+				modelLabel="Flash"
+				placement="hero"
+				onSubmit={submitMessage}
+			/>
+		</section>
+	)}
+</main>
 			{hasMessages ? (
 				<ChatComposer
 					disabled={isLoading}

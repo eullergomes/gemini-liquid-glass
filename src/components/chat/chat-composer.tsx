@@ -135,7 +135,7 @@ export function ChatComposer({
 						style={hasMessage ? { order: 2 } : undefined}
 						className={twMerge(
 							'hidden h-11 shrink-0 cursor-pointer items-center gap-2 rounded-full px-3 text-base font-semibold text-foreground-subtle transition-colors hover:bg-white/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring desktop:inline-flex',
-							hasMessage ? 'order-2 ml-auto' : '',
+							hasMessage ? 'order-2 ml-auto mr-10' : '',
 						)}
 					>
 						{modelLabel}
@@ -152,7 +152,7 @@ export function ChatComposer({
 					type={canSubmit ? 'submit' : 'button'}
 					style={hasMessage ? { order: 3 } : undefined}
 					className={twMerge(
-						canSubmit ? 'size-11 shadow-glass-soft [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5' : 'size-11 text-foreground-subtle hover:bg-white/10 hover:text-foreground [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5',
+						canSubmit ? 'size-11 shadow-glass-soft [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5 absolute right-3' : 'size-11 text-foreground-subtle hover:bg-white/10 hover:text-foreground [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5',
 						hasMessage ? 'order-3' : '',
 						hasMessage && !isHero ? 'ml-auto' : '',
 					)}

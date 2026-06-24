@@ -9,6 +9,32 @@ interface PersistedConversationSummary {
 	updatedAt: Date
 }
 
+interface PersistedConversationMessage {
+	content: string
+	createdAt: Date
+	id: string
+	role: string
+}
+
+interface PersistedConversationWithMessages {
+	id: string
+	messages: PersistedConversationMessage[]
+	title: string
+}
+
+interface SerializedConversationMessage {
+	content: string
+	createdAt: string
+	id: string
+	role: ChatMessageRole
+}
+
+interface SerializedConversationWithMessages {
+	id: string
+	messages: SerializedConversationMessage[]
+	title: string
+}
+
 function createConversationTitle(content: string) {
 	const normalizedContent = content.replace(/\s+/g, ' ').trim()
 
@@ -80,7 +106,7 @@ export async function listUserConversations(
 export async function listConversationMessages(
 	conversationId: string,
 	userId: string,
-) {
+): Promise<SerializedConversationWithMessages | null> {
 	const conversation = await prisma.conversation.findFirst({
 		where: {
 			id: conversationId,
@@ -99,7 +125,7 @@ export async function listConversationMessages(
 				},
 			},
 		},
-	})
+	}) as PersistedConversationWithMessages | null
 
 	if (!conversation) {
 		return null

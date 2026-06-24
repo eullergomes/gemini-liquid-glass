@@ -11,3 +11,9 @@ export interface ChatApiMessage {
 	content: string
 	role: ChatMessageRole
 }
+
+export interface ConversationSummary {
+	id: string
+	title: string
+	updatedAt: string
+}

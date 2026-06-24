@@ -19,11 +19,16 @@ import { twMerge } from 'tailwind-merge'
 import { AuthButton } from '@/components/auth/auth-button'
 import { GeminiMark } from '@/components/gemini/gemini-mark'
 import { IconButton } from '@/components/ui/icon-button'
+import type { ConversationSummary } from '@/types/chat'
 
 export interface SidebarProps {
+	activeConversationId?: null | string
+	conversations?: ConversationSummary[]
 	desktopOpen?: boolean
-	onNewConversation?: () => void
+	isLoadingConversations?: boolean
+	onConversationSelect?: (conversationId: string) => void
 	onDesktopOpenChange?: (open: boolean) => void
+	onNewConversation?: () => void
 	onOpenChange: (open: boolean) => void
 	open: boolean
 }
@@ -39,19 +44,6 @@ interface SectionTitleProps {
 	children: string
 	collapsible?: boolean
 }
-
-const recentItems = [
-	'Deixe essa foto profissional para ser usada no LinkedIn',
-	'Pedido de Liberação para Evento',
-	'Gerando Pôster Oficial da Copa 2026',
-	'Otimização de Currículo para Gupy',
-	'Design System Claude Creator',
-	'Logo Minimalista para Sistema de Sorteios',
-	'Atualizar Links de Galeria Específicos',
-	'Verificação de Domínio Resend para E-mail',
-	'Erro Pointer Lock em iOS',
-	'Estudo de Migração WebGL para WebGPU',
-]
 
 const focusableSelector = [
 	'button:not([disabled])',
@@ -114,12 +106,22 @@ function SectionTitle({ children, collapsible = false }: SectionTitleProps) {
 	)
 }
 
-function RecentItem({ children }: { children: string }) {
+function RecentItem({
+	active = false,
+	children,
+	onClick,
+}: {
+	active?: boolean
+	children: string
+	onClick?: () => void
+}) {
 	return (
 		<button
 			type="button"
 			data-slot="recent-item"
+			data-active={active ? '' : undefined}
 			className="sidebar-liquid-button group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+			onClick={onClick}
 		>
 			<span className="sidebar-liquid-label">
 				{children}
@@ -130,6 +132,16 @@ function RecentItem({ children }: { children: string }) {
 				className="sidebar-liquid-icon size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
 			/>
 		</button>
+	)
+}
+
+function RecentEmptyState({ isLoading }: { isLoading?: boolean }) {
+	return (
+		<p className="px-4 py-3 text-sm leading-6 text-muted-foreground">
+			{isLoading
+				? 'Carregando conversas...'
+				: 'Faça login e envie uma mensagem para salvar suas conversas.'}
+		</p>
 	)
 }
 
@@ -154,7 +166,7 @@ function SidebarHeader({
 			)}
 		>
 			{expanded ? (
-				<div className="flex min-w-0 items-center gap-3 cursor-pointer">
+				<div className="flex min-w-0 cursor-pointer items-center gap-3">
 					<GeminiMark
 						size="sm"
 						aria-label="Gemini"
@@ -184,7 +196,10 @@ function SidebarHeader({
 					onClick={onToggle}
 				>
 					{isMobile ? (
-						<X aria-hidden="true" color='white' />
+						<X
+							aria-hidden="true"
+							color="white"
+						/>
 					) : (
 						<PanelLeftClose
 							aria-hidden="true"
@@ -195,9 +210,7 @@ function SidebarHeader({
 				{isMobile ? null : (
 					<span
 						role="tooltip"
-						className={twMerge(
-							'pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-background/88 px-4 py-2 text-sm font-medium text-foreground opacity-0 shadow-[0_14px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl transition-opacity duration-150 group-hover:opacity-100',
-						)}
+						className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-background/88 px-4 py-2 text-sm font-medium text-foreground opacity-0 shadow-[0_14px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl transition-opacity duration-150 group-hover:opacity-100"
 					>
 						{tooltipLabel}
 					</span>
@@ -207,7 +220,19 @@ function SidebarHeader({
 	)
 }
 
-function SidebarContent({ onNewConversation }: { onNewConversation?: () => void }) {
+function SidebarContent({
+	activeConversationId,
+	conversations = [],
+	isLoadingConversations = false,
+	onConversationSelect,
+	onNewConversation,
+}: {
+	activeConversationId?: null | string
+	conversations?: ConversationSummary[]
+	isLoadingConversations?: boolean
+	onConversationSelect?: (conversationId: string) => void
+	onNewConversation?: () => void
+}) {
 	return (
 		<div className="sidebar-liquid-layer flex min-h-0 flex-1 flex-col">
 			<div className="shrink-0 space-y-1 px-2 pb-3">
@@ -252,9 +277,19 @@ function SidebarContent({ onNewConversation }: { onNewConversation?: () => void 
 				<SectionTitle collapsible>Recentes</SectionTitle>
 
 				<div className="mt-1 space-y-1">
-					{recentItems.map((item) => (
-						<RecentItem key={item}>{item}</RecentItem>
-					))}
+					{conversations.length > 0 ? (
+						conversations.map((conversation) => (
+							<RecentItem
+								active={conversation.id === activeConversationId}
+								key={conversation.id}
+								onClick={() => onConversationSelect?.(conversation.id)}
+							>
+								{conversation.title}
+							</RecentItem>
+						))
+					) : (
+						<RecentEmptyState isLoading={isLoadingConversations} />
+					)}
 				</div>
 			</div>
 		</div>
@@ -270,7 +305,11 @@ function SidebarFooter() {
 }
 
 export function Sidebar({
+	activeConversationId,
+	conversations,
 	desktopOpen = true,
+	isLoadingConversations,
+	onConversationSelect,
 	onDesktopOpenChange,
 	onNewConversation,
 	onOpenChange,
@@ -380,7 +419,13 @@ export function Sidebar({
 				/>
 				{desktopOpen ? (
 					<>
-						<SidebarContent onNewConversation={startNewConversation} />
+						<SidebarContent
+							activeConversationId={activeConversationId}
+							conversations={conversations}
+							isLoadingConversations={isLoadingConversations}
+							onConversationSelect={onConversationSelect}
+							onNewConversation={startNewConversation}
+						/>
 						<SidebarFooter />
 					</>
 				) : (
@@ -445,7 +490,13 @@ export function Sidebar({
 						titleId="gemini-sidebar-title"
 						onToggle={closeSidebar}
 					/>
-					<SidebarContent onNewConversation={startNewConversation} />
+					<SidebarContent
+						activeConversationId={activeConversationId}
+						conversations={conversations}
+						isLoadingConversations={isLoadingConversations}
+						onConversationSelect={onConversationSelect}
+						onNewConversation={startNewConversation}
+					/>
 					<SidebarFooter />
 				</aside>
 			</div>

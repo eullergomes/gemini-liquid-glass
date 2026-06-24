@@ -1,15 +1,21 @@
 import { streamText } from 'ai'
 import { z } from 'zod'
+import { auth } from '@/auth'
 import {
 	CHAT_SYSTEM_PROMPT,
 	getGeminiModel,
 	hasGoogleGenerativeAiApiKey,
 	toModelMessages,
 } from '@/lib/ai'
+import {
+	ensureUserConversation,
+	persistConversationTurn,
+} from '@/lib/conversations'
 
 export const maxDuration = 30
 
 const chatRequestSchema = z.object({
+	conversationId: z.string().min(1).optional(),
 	messages: z.array(
 		z.object({
 			role: z.enum(['user', 'assistant']),
@@ -48,14 +54,54 @@ export async function POST(request: Request): Promise<Response> {
 		)
 	}
 
+	const session = await auth()
+	const userId = session?.user?.id
+	const lastUserMessage = [...parsedPayload.data.messages].reverse().find((message) => (
+		message.role === 'user'
+	))
+	let persistedConversationId: string | undefined
+
+	if (userId && lastUserMessage) {
+		const conversation = await ensureUserConversation({
+			conversationId: parsedPayload.data.conversationId,
+			titleSource: lastUserMessage.content,
+			userId,
+		})
+
+		if (!conversation) {
+			return Response.json(
+				{ error: 'Conversa não encontrada para este usuário.' },
+				{ status: 404 },
+			)
+		}
+
+		persistedConversationId = conversation.id
+	}
+
 	try {
 		const result = streamText({
 			model: getGeminiModel(),
 			system: CHAT_SYSTEM_PROMPT,
 			messages: toModelMessages(parsedPayload.data.messages),
+			async onFinish(event) {
+				if (!userId || !persistedConversationId || !event.text.trim()) {
+					return
+				}
+
+				await persistConversationTurn({
+					assistantContent: event.text,
+					conversationId: persistedConversationId,
+					messages: parsedPayload.data.messages,
+					userId,
+				})
+			},
 		})
 
-		return result.toTextStreamResponse()
+		return result.toTextStreamResponse({
+			headers: persistedConversationId
+				? { 'x-conversation-id': persistedConversationId }
+				: undefined,
+		})
 	} catch {
 		return Response.json(
 			{ error: 'Não foi possível iniciar a resposta da IA agora.' },

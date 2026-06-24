@@ -1,13 +1,18 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useCallback, useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { GeminiHeader } from '@/components/gemini/gemini-header'
 import { GeminiMark } from '@/components/gemini/gemini-mark'
 import { Sidebar } from '@/components/gemini/sidebar'
-import type { ChatApiMessage, ChatMessage } from '@/types/chat'
+import type {
+	ChatApiMessage,
+	ChatMessage,
+	ConversationSummary,
+} from '@/types/chat'
 
 const modelLabel = 'Gemini 2.5 Flash'
 const heroTitle = 'Conheça o Gemini, seu assistente pessoal de IA com um visual Liquid Glass'
@@ -17,7 +22,23 @@ const friendlyErrorPrefixes = [
 	'A resposta',
 	'Envie',
 	'Não foi',
+	'Conversa',
 ]
+
+interface ConversationListResponse {
+	conversations?: ConversationSummary[]
+}
+
+interface StoredConversationResponse {
+	id: string
+	messages: Array<{
+		content: string
+		createdAt: string
+		id: string
+		role: ChatMessage['role']
+	}>
+	title: string
+}
 
 function createMessageId(prefix: string) {
 	if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -59,15 +80,60 @@ async function readErrorMessage(response: Response) {
 }
 
 export function AppShell() {
+	const { data: session, status } = useSession()
+	const userId = session?.user?.id ?? null
+	const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+	const [conversations, setConversations] = useState<ConversationSummary[]>([])
 	const [error, setError] = useState<string | null>(null)
 	const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true)
 	const [isLoading, setIsLoading] = useState(false)
+	const [isOpeningConversation, setIsOpeningConversation] = useState(false)
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const hasMessages = messages.length > 0
+	const canUseSavedConversations = status === 'authenticated'
 	const shellStyle = {
 		'--sidebar-offset': isDesktopSidebarOpen ? '22.5rem' : '4rem',
 	} as CSSProperties
+
+	const refreshConversations = useCallback(async () => {
+		if (!canUseSavedConversations) {
+			setConversations([])
+			return
+		}
+
+		try {
+			const response = await fetch('/api/conversations', {
+				cache: 'no-store',
+			})
+
+			if (!response.ok) {
+				return
+			}
+
+			const payload = await response.json() as ConversationListResponse
+			setConversations(Array.isArray(payload.conversations) ? payload.conversations : [])
+		} catch {
+			setConversations([])
+		}
+	}, [canUseSavedConversations])
+
+	useEffect(() => {
+		if (status !== 'authenticated') {
+			const resetSessionState = window.setTimeout(() => {
+				setActiveConversationId(null)
+				setConversations([])
+			}, 0)
+
+			return () => window.clearTimeout(resetSessionState)
+		}
+
+		const refreshSessionState = window.setTimeout(() => {
+			void refreshConversations()
+		}, 0)
+
+		return () => window.clearTimeout(refreshSessionState)
+	}, [refreshConversations, status, userId])
 
 	const openSidebar = useCallback(() => {
 		setIsSidebarOpen(true)
@@ -78,6 +144,7 @@ export function AppShell() {
 		setIsLoading(true)
 
 		let assistantMessageId: string | null = null
+		let nextConversationId = activeConversationId
 
 		try {
 			const response = await fetch('/api/chat', {
@@ -86,12 +153,22 @@ export function AppShell() {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
+					conversationId: canUseSavedConversations
+						? activeConversationId ?? undefined
+						: undefined,
 					messages: toApiMessages(conversationMessages),
 				}),
 			})
 
 			if (!response.ok) {
 				throw new Error(await readErrorMessage(response))
+			}
+
+			const responseConversationId = response.headers.get('x-conversation-id')
+
+			if (responseConversationId) {
+				nextConversationId = responseConversationId
+				setActiveConversationId(responseConversationId)
 			}
 
 			if (!response.body) {
@@ -136,6 +213,10 @@ export function AppShell() {
 					? { ...message, content: assistantContent.trim() || 'Não recebi conteúdo da IA.' }
 					: message
 			)))
+
+			if (nextConversationId) {
+				void refreshConversations()
+			}
 		} catch (caughtError) {
 			if (assistantMessageId) {
 				setMessages((currentMessages) => currentMessages.filter((message) => (
@@ -147,7 +228,7 @@ export function AppShell() {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [])
+	}, [activeConversationId, canUseSavedConversations, refreshConversations])
 
 	const submitMessage = useCallback((content: string) => {
 		const trimmedContent = content.trim()
@@ -186,11 +267,44 @@ export function AppShell() {
 	}, [isLoading, messages, requestAssistantResponse])
 
 	const clearConversation = useCallback(() => {
+		setActiveConversationId(null)
 		setError(null)
 		setMessages([])
 		setIsLoading(false)
 		setIsSidebarOpen(false)
 	}, [])
+
+	const openConversation = useCallback(async (conversationId: string) => {
+		if (isLoading || isOpeningConversation) {
+			return
+		}
+
+		setError(null)
+		setIsOpeningConversation(true)
+
+		try {
+			const response = await fetch(`/api/conversations/${conversationId}`, {
+				cache: 'no-store',
+			})
+
+			if (!response.ok) {
+				throw new Error(await readErrorMessage(response))
+			}
+
+			const payload = await response.json() as StoredConversationResponse
+
+			setActiveConversationId(payload.id)
+			setMessages(payload.messages.map((message) => ({
+				...message,
+				createdAt: new Date(message.createdAt),
+			})))
+			setIsSidebarOpen(false)
+		} catch (caughtError) {
+			setError(getFriendlyErrorMessage(caughtError))
+		} finally {
+			setIsOpeningConversation(false)
+		}
+	}, [isLoading, isOpeningConversation])
 
 	return (
 		<div
@@ -200,7 +314,11 @@ export function AppShell() {
 			style={shellStyle}
 		>
 			<Sidebar
+				activeConversationId={activeConversationId}
+				conversations={canUseSavedConversations ? conversations : []}
 				desktopOpen={isDesktopSidebarOpen}
+				isLoadingConversations={status === 'loading' || isOpeningConversation}
+				onConversationSelect={openConversation}
 				onDesktopOpenChange={setIsDesktopSidebarOpen}
 				onNewConversation={clearConversation}
 				open={isSidebarOpen}
@@ -212,49 +330,49 @@ export function AppShell() {
 				onMenuOpen={openSidebar}
 			/>
 			<main
-	data-slot="app-main"
-	className={
-		hasMessages
-			? 'relative z-10 flex min-h-dvh w-full flex-col px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pt-20 motion-reduce:transition-none'
-			: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pb-14 desktop:pt-20 motion-reduce:transition-none'
-	}
->
-	{hasMessages ? (
-		<div className="animate-liquid-enter mx-auto flex w-full max-w-4xl flex-1 flex-col">
-			<ChatThread
-				error={error}
-				isLoading={isLoading}
-				messages={messages}
-				onRetry={retryLastMessage}
-			/>
-		</div>
-	) : (
-		<section
-			aria-labelledby="empty-state-title"
-			className="mx-auto flex w-full max-w-[53rem] flex-1 flex-col items-center justify-center gap-8 text-center desktop:gap-14"
-		>
-			<GeminiMark
-				size="lg"
-				className="desktop:hidden"
-				aria-label="Gemini"
-			/>
-
-			<h1
-				id="empty-state-title"
-				className="max-w-[22rem] text-balance text-[1.85rem] font-normal leading-[1.2] tracking-normal text-foreground desktop:max-w-[56rem] desktop:text-[3rem] desktop:leading-[1.15]"
+				data-slot="app-main"
+				className={
+					hasMessages
+						? 'relative z-10 flex min-h-dvh w-full flex-col px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pt-20 motion-reduce:transition-none'
+						: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pb-14 desktop:pt-20 motion-reduce:transition-none'
+				}
 			>
-				{heroTitle}
-			</h1>
+				{hasMessages ? (
+					<div className="animate-liquid-enter mx-auto flex w-full max-w-4xl flex-1 flex-col">
+						<ChatThread
+							error={error}
+							isLoading={isLoading}
+							messages={messages}
+							onRetry={retryLastMessage}
+						/>
+					</div>
+				) : (
+					<section
+						aria-labelledby="empty-state-title"
+						className="mx-auto flex w-full max-w-[53rem] flex-1 flex-col items-center justify-center gap-8 text-center desktop:gap-14"
+					>
+						<GeminiMark
+							size="lg"
+							className="desktop:hidden"
+							aria-label="Gemini"
+						/>
 
-			<ChatComposer
-				disabled={isLoading}
-				modelLabel="Flash"
-				placement="hero"
-				onSubmit={submitMessage}
-			/>
-		</section>
-	)}
-</main>
+						<h1
+							id="empty-state-title"
+							className="max-w-[22rem] text-balance text-[1.85rem] font-normal leading-[1.2] tracking-normal text-foreground desktop:max-w-[56rem] desktop:text-[3rem] desktop:leading-[1.15]"
+						>
+							{heroTitle}
+						</h1>
+
+						<ChatComposer
+							disabled={isLoading}
+							modelLabel="Flash"
+							placement="hero"
+							onSubmit={submitMessage}
+						/>
+					</section>
+				)}
+			</main>
 			{hasMessages ? (
 				<ChatComposer
 					disabled={isLoading}
@@ -263,9 +381,6 @@ export function AppShell() {
 					onSubmit={submitMessage}
 				/>
 			) : null}
-			{/* <p className="fixed bottom-3 left-[var(--sidebar-offset)] right-0 z-10 hidden text-center text-xs font-medium text-muted-foreground desktop:block">
-				Sujeito aos Termos do Google e à Política de Privacidade do Google. O Gemini é uma IA e pode cometer erros.
-			</p> */}
 		</div>
 	)
 }

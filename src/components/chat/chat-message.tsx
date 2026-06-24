@@ -1,8 +1,25 @@
-import { Avatar } from '@/components/ui/avatar'
+import ReactMarkdown, { type Components } from 'react-markdown'
+import rehypeSanitize from 'rehype-sanitize'
+import remarkGfm from 'remark-gfm'
 import type { ChatMessage as ChatMessageType } from '@/types/chat'
 
 export interface ChatMessageProps {
 	message: ChatMessageType
+}
+
+const markdownComponents: Components = {
+	a({ children, href, title }) {
+		return (
+			<a
+				href={href}
+				rel="noreferrer"
+				target="_blank"
+				title={title}
+			>
+				{children}
+			</a>
+		)
+	},
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
@@ -27,15 +44,27 @@ export function ChatMessage({ message }: ChatMessageProps) {
 			)} */}
 			<div
 				data-slot="message-bubble"
-				className={`max-w-[86%] whitespace-pre-wrap rounded-[1.35rem] px-4 py-3 text-sm leading-6 transition-shadow duration-300 desktop:max-w-[90%] ${
+				className={`max-w-full rounded-[1.35rem] px-4 py-3 text-sm leading-6 transition-shadow duration-300 desktop:max-w-[90%] ${
 					isUser
-						? 'bg-[#2b2b2b] text-white shadow-glass-soft'
+						? 'whitespace-pre-wrap bg-[#2b2b2b] text-white shadow-glass-soft'
 						: 'bg-transparent text-white'
 				}`}
 			>
-				{message.content}
+				{isUser ? (
+					message.content
+				) : (
+					<div data-slot="assistant-markdown">
+						<ReactMarkdown
+							components={markdownComponents}
+							rehypePlugins={[rehypeSanitize]}
+							remarkPlugins={[remarkGfm]}
+						>
+							{message.content}
+						</ReactMarkdown>
+					</div>
+				)}
 			</div>
-			{isUser ? (
+			{/* {isUser ? (
 				<Avatar
 					name="Eulle"
 					size="sm"
@@ -43,7 +72,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 					aria-label="Você"
 					className="mt-1"
 				/>
-			) : null}
+			) : null} */}
 		</article>
 	)
 }

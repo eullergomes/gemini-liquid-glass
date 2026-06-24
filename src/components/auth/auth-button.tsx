@@ -167,17 +167,19 @@ export function AuthButton({
 						</p>
 					</div>
 				) : null}
-				<IconButton
-					aria-label="Sair"
-					variant="ghost"
-					size={isSidebar ? 'lg' : 'sm'}
-					className="text-muted-foreground hover:bg-white/10 hover:text-white"
-					onClick={() => {
-						void signOut()
-					}}
-				>
-					<LogOut aria-hidden="true" />
-				</IconButton>
+				{isSidebar && (
+					<IconButton
+						aria-label="Sair"
+						variant="ghost"
+						size="lg"
+						className="text-muted-foreground hover:bg-white/10 hover:text-white"
+						onClick={() => {
+							void signOut()
+						}}
+					>
+						<LogOut aria-hidden="true" />
+					</IconButton>
+				)}
 			</div>
 		)
 	}

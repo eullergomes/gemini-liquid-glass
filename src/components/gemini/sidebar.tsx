@@ -367,6 +367,38 @@ function SidebarHeader({
 	titleId: string
 }) {
 	const tooltipLabel = expanded ? 'Fechar barra lateral' : 'Abrir barra lateral'
+	const [isTooltipOpen, setIsTooltipOpen] = useState(false)
+	const [tooltipPosition, setTooltipPosition] = useState<MenuPosition | null>(null)
+	const tooltipButtonRef = useRef<HTMLButtonElement>(null)
+
+	function updateTooltipPosition() {
+		const rect = tooltipButtonRef.current?.getBoundingClientRect()
+
+		if (!rect) {
+			return
+		}
+
+		setTooltipPosition({
+			left: rect.right + 8,
+			top: rect.top + (rect.height / 2),
+		})
+	}
+
+	const tooltip = !isMobile && isTooltipOpen && tooltipPosition
+		? createPortal(
+			<span
+				role="tooltip"
+				className="pointer-events-none fixed z-[140] -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-background/92 px-4 py-2 text-sm font-medium text-foreground opacity-100 shadow-[0_14px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl"
+				style={{
+					left: tooltipPosition.left,
+					top: tooltipPosition.top,
+				}}
+			>
+				{tooltipLabel}
+			</span>,
+			document.body,
+		)
+		: null
 
 	return (
 		<div
@@ -398,12 +430,22 @@ function SidebarHeader({
 			)}
 			<div className="group relative">
 				<IconButton
+					ref={tooltipButtonRef}
 					aria-label={tooltipLabel}
 					variant="ghost"
 					size="lg"
-					title={tooltipLabel}
 					className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+					onBlur={() => setIsTooltipOpen(false)}
 					onClick={onToggle}
+					onFocus={() => {
+						updateTooltipPosition()
+						setIsTooltipOpen(true)
+					}}
+					onMouseEnter={() => {
+						updateTooltipPosition()
+						setIsTooltipOpen(true)
+					}}
+					onMouseLeave={() => setIsTooltipOpen(false)}
 				>
 					{isMobile ? (
 						<X
@@ -417,14 +459,7 @@ function SidebarHeader({
 						/>
 					)}
 				</IconButton>
-				{isMobile ? null : (
-					<span
-						role="tooltip"
-						className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-background/88 px-4 py-2 text-sm font-medium text-foreground opacity-0 shadow-[0_14px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl transition-opacity duration-150 group-hover:opacity-100"
-					>
-						{tooltipLabel}
-					</span>
-				)}
+				{tooltip}
 			</div>
 		</div>
 	)

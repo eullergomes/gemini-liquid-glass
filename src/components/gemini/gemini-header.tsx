@@ -29,9 +29,9 @@ export function GeminiHeader({
 			<div className="flex min-w-0 items-center gap-3 desktop:hidden">
 				<IconButton
 					aria-label="Abrir menu"
-					variant="ghost"
+					variant="glass"
 					size="lg"
-					className="text-foreground hover:bg-white/10 hover:text-foreground"
+					className="border-transparent text-foreground shadow-none hover:text-foreground"
 					aria-controls="gemini-sidebar"
 					aria-expanded={isMenuOpen}
 					aria-haspopup="dialog"
@@ -42,7 +42,7 @@ export function GeminiHeader({
 				<Button
 					variant="ghost"
 					size="sm"
-					className="h-9 rounded-full px-1 text-base font-semibold text-foreground hover:bg-white/10"
+					className="h-9 rounded-full border-transparent bg-transparent px-2 text-base font-semibold text-foreground shadow-none hover:text-foreground"
 				>
 					<span className="truncate">{modelLabel}</span>
 					<ChevronDown aria-hidden="true" />

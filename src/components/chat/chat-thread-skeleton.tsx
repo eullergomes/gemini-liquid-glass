@@ -20,7 +20,7 @@ export function ChatThreadSkeleton() {
 					className={`flex ${row.align === 'end' ? 'justify-end' : 'justify-start'}`}
 				>
 					<div
-						className={`glass-panel h-14 animate-pulse rounded-[1.35rem] bg-white/7 ${row.width}`}
+						className={`glass-surface h-14 animate-pulse rounded-[1.35rem] border-white/8 ${row.width}`}
 					/>
 				</div>
 			))}

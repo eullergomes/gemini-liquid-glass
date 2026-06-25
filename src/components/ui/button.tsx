@@ -10,10 +10,10 @@ export const buttonVariants = tv({
 	],
 	variants: {
 		variant: {
-			primary: 'border-primary bg-primary text-primary-foreground hover:bg-primary-hover',
-			secondary: 'border-border bg-secondary text-foreground hover:bg-muted',
-			ghost: 'border-transparent bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
-			destructive: 'border-destructive bg-destructive text-primary-foreground hover:bg-destructive/90',
+			primary: 'glass-button-primary glass-refract-control glass-refract-hover border-primary text-primary-foreground',
+			secondary: 'glass-button border-border text-foreground',
+			ghost: 'glass-button border-transparent bg-transparent text-muted-foreground shadow-none hover:text-foreground',
+			destructive: 'glass-button-destructive glass-refract-control glass-refract-hover border-destructive text-primary-foreground',
 		},
 		size: {
 			sm: 'h-8 gap-1.5 px-2 text-xs [&_svg]:size-3',

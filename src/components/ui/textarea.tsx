@@ -4,15 +4,15 @@ import type { ComponentProps } from 'react'
 
 export const textareaVariants = tv({
 	base: [
-		'min-h-24 w-full resize-none rounded-lg border border-input bg-input px-3 py-2 text-sm text-foreground shadow-glass-soft transition-colors',
+		'min-h-24 w-full resize-none rounded-lg px-3 py-2 text-sm text-foreground transition-colors',
 		'placeholder:text-muted-foreground',
 		'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 		'disabled:cursor-not-allowed disabled:opacity-50',
 	],
 	variants: {
 		variant: {
-			default: 'bg-input',
-			glass: 'glass-panel bg-surface/70 backdrop-blur-2xl',
+			default: 'glass-input',
+			glass: 'glass-input glass-refract-soft',
 		},
 		controlSize: {
 			sm: 'min-h-20 text-xs',

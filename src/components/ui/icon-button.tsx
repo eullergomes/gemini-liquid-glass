@@ -10,10 +10,10 @@ export const iconButtonVariants = tv({
 	],
 	variants: {
 		variant: {
-			primary: 'border-primary bg-primary text-primary-foreground hover:bg-primary-hover',
-			secondary: 'border-border bg-secondary text-foreground hover:bg-muted',
-			ghost: 'border-transparent bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-glass-soft',
-			glass: 'glass-panel glass-inner-glow border-border text-foreground hover:bg-surface-raised hover:shadow-glass-focus',
+			primary: 'glass-button-primary glass-refract-control glass-refract-hover border-primary text-primary-foreground',
+			secondary: 'glass-icon-button border-border text-foreground',
+			ghost: 'glass-icon-button border-transparent bg-transparent text-muted-foreground shadow-none hover:text-foreground',
+			glass: 'glass-icon-button glass-refract-control glass-refract-hover glass-inner-glow border-border text-foreground',
 		},
 		size: {
 			sm: 'size-8 [&_svg]:size-3.5',

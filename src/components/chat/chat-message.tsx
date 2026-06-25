@@ -46,7 +46,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 				data-slot="message-bubble"
 				className={`max-w-full rounded-[1.35rem] px-4 py-3 text-sm leading-6 transition-shadow duration-300 desktop:max-w-[90%] ${
 					isUser
-						? 'whitespace-pre-wrap bg-[#2b2b2b] text-white shadow-glass-soft'
+						? 'glass-surface glass-inner-glow whitespace-pre-wrap border-white/8 text-white'
 						: 'bg-transparent text-white'
 				}`}
 			>

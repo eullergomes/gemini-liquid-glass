@@ -105,9 +105,9 @@ function LoginModal({
 					</div>
 					<IconButton
 						aria-label="Fechar login"
-						variant="ghost"
+						variant="glass"
 						size="sm"
-						className="text-muted-foreground hover:bg-white/10 hover:text-white"
+						className="border-transparent text-muted-foreground shadow-none hover:text-white"
 						onClick={onClose}
 					>
 						<X aria-hidden="true" />
@@ -116,7 +116,7 @@ function LoginModal({
 				<Button
 					variant="secondary"
 					size="lg"
-					className="mt-6 h-12 w-full rounded-full border-white/12 bg-white/8 text-base font-semibold text-white hover:bg-white/14"
+					className="glass-refract-control glass-refract-hover mt-6 h-12 w-full rounded-full border-white/12 text-base font-semibold text-white"
 					onClick={() => {
 						void signIn('google')
 					}}
@@ -170,9 +170,9 @@ export function AuthButton({
 				{isSidebar && (
 					<IconButton
 						aria-label="Sair"
-						variant="ghost"
+						variant="glass"
 						size="lg"
-						className="text-muted-foreground hover:bg-white/10 hover:text-white"
+						className="border-transparent text-muted-foreground shadow-none hover:text-white"
 						onClick={() => {
 							void signOut()
 						}}
@@ -191,7 +191,7 @@ export function AuthButton({
 				size={isSidebar ? 'md' : 'md'}
 				className={twMerge(
 					'h-11 rounded-full border-transparent px-5 text-sm font-semibold shadow-none',
-					isSidebar ? 'w-full justify-start bg-white/10 text-white hover:bg-white/14' : 'desktop:ml-6 desktop:h-12 desktop:px-6 desktop:text-base',
+					isSidebar ? 'w-full justify-start text-white' : 'desktop:ml-6 desktop:h-12 desktop:px-6 desktop:text-base',
 					className,
 				)}
 				disabled={status === 'loading'}

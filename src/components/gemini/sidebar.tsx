@@ -76,7 +76,7 @@ function SidebarButton({
 			data-slot="sidebar-button"
 			data-active={active ? '' : undefined}
 			className={twMerge(
-				'sidebar-liquid-button group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+				'sidebar-liquid-button glass-list-item group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 				className,
 			)}
 			{...props}
@@ -218,7 +218,7 @@ function RecentItem({
 			<div
 				ref={menuRef}
 				role="menu"
-				className="fixed z-[120] min-w-28 rounded-2xl border-none p-1.5 backdrop-blur-2xl bg-transparent shadow-[0_10px_24px_rgba(0,0,0,0.22)]"
+				className="glass-elevated glass-inner-glow fixed z-[120] min-w-28 rounded-2xl border-white/10 bg-[#202124]/88 p-1.5 shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur-2xl"
 				style={{
 					left: menuPosition.left,
 					top: menuPosition.top,
@@ -227,7 +227,7 @@ function RecentItem({
 				<button
 					type="button"
 					role="menuitem"
-					className="glass-inner-glow flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/7 px-4 py-2.5 text-right text-sm font-semibold text-destructive shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_24px_rgba(0,0,0,0.22)] transition-colors hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					className="glass-button-destructive glass-refract-control glass-refract-hover glass-inner-glow flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 px-4 py-2.5 text-right text-sm font-semibold text-destructive shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_24px_rgba(0,0,0,0.22)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 					onClick={() => {
 						setIsMenuOpen(false)
 						setIsModalOpen(true)
@@ -307,7 +307,7 @@ function RecentItem({
 		<div
 			data-slot="recent-item"
 			data-active={active ? '' : undefined}
-			className="sidebar-liquid-button group relative focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
+			className="sidebar-liquid-button glass-list-item group relative focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
 		>
 			<button
 				type="button"
@@ -325,9 +325,9 @@ function RecentItem({
 					aria-label={`Abrir opções de ${children}`}
 					aria-expanded={isMenuOpen}
 					aria-haspopup="menu"
-					variant="ghost"
+					variant="glass"
 					size="sm"
-					className="size-8 text-muted-foreground opacity-100 hover:bg-white/10 hover:text-foreground desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-focus-within:opacity-100 data-[open]:opacity-100"
+					className="size-8 border-transparent text-muted-foreground opacity-100 shadow-none hover:text-foreground desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-focus-within:opacity-100 data-[open]:opacity-100"
 					data-open={isMenuOpen ? '' : undefined}
 					onClick={(event) => {
 						event.stopPropagation()
@@ -432,9 +432,9 @@ function SidebarHeader({
 				<IconButton
 					ref={tooltipButtonRef}
 					aria-label={tooltipLabel}
-					variant="ghost"
+					variant="glass"
 					size="lg"
-					className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+					className="border-transparent text-muted-foreground shadow-none hover:text-foreground"
 					onBlur={() => setIsTooltipOpen(false)}
 					onClick={onToggle}
 					onFocus={() => {
@@ -688,9 +688,9 @@ export function Sidebar({
 							/>
 							<IconButton
 								aria-label="Nova conversa"
-								variant="ghost"
+								variant="glass"
 								size="md"
-								className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+								className="border-transparent text-muted-foreground shadow-none hover:text-foreground"
 								onClick={onNewConversation}
 							>
 								<Paperclip aria-hidden="true" />
@@ -698,9 +698,9 @@ export function Sidebar({
 						</div>
 						<IconButton
 							aria-label="Configurações"
-							variant="ghost"
+							variant="glass"
 							size="lg"
-							className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
+							className="border-transparent text-muted-foreground shadow-none hover:text-foreground"
 						>
 							<Settings aria-hidden="true" />
 						</IconButton>

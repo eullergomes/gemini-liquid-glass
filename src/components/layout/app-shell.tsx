@@ -456,8 +456,8 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 				data-slot="app-main"
 				className={
 					hasConversationView
-						? 'relative z-10 flex min-h-dvh w-full flex-col px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pt-20 motion-reduce:transition-none'
-						: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-36 pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pb-14 desktop:pt-20 motion-reduce:transition-none'
+						? 'relative z-10 flex min-h-dvh w-full flex-col px-4 pb-[calc(9rem+env(safe-area-inset-bottom))] pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pt-20 motion-reduce:transition-none'
+						: 'relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-4 pb-[calc(9rem+env(safe-area-inset-bottom))] pt-20 transition-[padding] duration-300 ease-out desktop:pl-[calc(var(--sidebar-offset)_+_3rem)] desktop:pr-12 desktop:pb-14 desktop:pt-20 motion-reduce:transition-none'
 				}
 			>
 				{hasConversationView ? (
@@ -514,7 +514,7 @@ export function AppShell({ initialConversationId }: AppShellProps) {
 					aria-live="polite"
 					data-slot="app-toast"
 					data-type={toast.type}
-					className="glass-elevated fixed bottom-24 left-4 right-4 z-[80] mx-auto max-w-sm rounded-2xl border-white/12 bg-[#202124]/95 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_55px_rgba(0,0,0,0.4)] backdrop-blur-2xl desktop:bottom-8 desktop:left-auto desktop:right-8 desktop:mx-0"
+					className="glass-elevated glass-inner-glow fixed bottom-24 left-4 right-4 z-[80] mx-auto max-w-sm rounded-2xl border-white/12 bg-[#202124]/95 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_55px_rgba(0,0,0,0.4)] backdrop-blur-2xl desktop:bottom-8 desktop:left-auto desktop:right-8 desktop:mx-0"
 				>
 					{toast.message}
 				</div>

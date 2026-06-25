@@ -1,0 +1,87 @@
+export function GlassFilters() {
+	return (
+		<svg
+			aria-hidden="true"
+			data-slot="glass-filters"
+			focusable="false"
+			className="pointer-events-none fixed size-0 overflow-hidden"
+			style={{
+				clipPath: 'inset(50%)',
+			}}
+		>
+			<defs>
+				<filter
+					id="liquid-glass-soft"
+					x="-8%"
+					y="-12%"
+					width="116%"
+					height="124%"
+					colorInterpolationFilters="sRGB"
+					filterUnits="objectBoundingBox"
+				>
+					<feTurbulence
+						type="fractalNoise"
+						baseFrequency="0.012 0.018"
+						numOctaves="1"
+						seed="8"
+						result="softNoise"
+					/>
+					<feDisplacementMap
+						in="SourceGraphic"
+						in2="softNoise"
+						scale="1.15"
+						xChannelSelector="R"
+						yChannelSelector="G"
+						result="softDisplace"
+					/>
+					<feGaussianBlur
+						in="softDisplace"
+						stdDeviation="0.16"
+						result="softBlur"
+					/>
+					<feColorMatrix
+						in="softBlur"
+						type="saturate"
+						values="1.08"
+					/>
+				</filter>
+
+				<filter
+					id="liquid-glass-control"
+					x="-12%"
+					y="-18%"
+					width="124%"
+					height="136%"
+					colorInterpolationFilters="sRGB"
+					filterUnits="objectBoundingBox"
+				>
+					<feTurbulence
+						type="fractalNoise"
+						baseFrequency="0.018 0.026"
+						numOctaves="1"
+						seed="14"
+						result="controlNoise"
+					/>
+					<feDisplacementMap
+						in="SourceGraphic"
+						in2="controlNoise"
+						scale="1.85"
+						xChannelSelector="R"
+						yChannelSelector="G"
+						result="controlDisplace"
+					/>
+					<feGaussianBlur
+						in="controlDisplace"
+						stdDeviation="0.12"
+						result="controlBlur"
+					/>
+					<feColorMatrix
+						in="controlBlur"
+						type="saturate"
+						values="1.14"
+					/>
+				</filter>
+			</defs>
+		</svg>
+	)
+}

@@ -10,7 +10,7 @@ export function ChatError({ message, onRetry }: ChatErrorProps) {
 	return (
 		<div
 			data-slot="chat-error"
-			className="animate-liquid-pop rounded-[1.35rem] border border-destructive/30 bg-destructive/10 p-4 text-sm text-foreground"
+			className="glass-surface glass-inner-glow animate-liquid-pop rounded-[1.35rem] border-destructive/30 bg-destructive/10 p-4 text-sm text-foreground"
 			role="alert"
 		>
 			<p className="leading-6 text-foreground-subtle">{message}</p>
@@ -18,7 +18,7 @@ export function ChatError({ message, onRetry }: ChatErrorProps) {
 				<Button
 					variant="secondary"
 					size="sm"
-					className="mt-3 rounded-full"
+					className="glass-refract-control glass-refract-hover mt-3 rounded-full"
 					onClick={onRetry}
 				>
 					<RotateCcw aria-hidden="true" />

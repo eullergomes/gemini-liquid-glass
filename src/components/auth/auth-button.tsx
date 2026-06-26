@@ -3,6 +3,7 @@
 import { LogOut, X } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { twMerge } from 'tailwind-merge'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -69,7 +70,7 @@ function LoginModal({
 		return null
 	}
 
-	return (
+	return createPortal(
 		<div
 			data-slot="auth-modal-root"
 			className="fixed inset-0 z-50 flex items-center justify-center px-4"
@@ -103,14 +104,52 @@ function LoginModal({
 							Conecte-se usando sua conta do Google.
 						</p>
 					</div>
+					{/* <IconButton
+					ref={tooltipButtonRef}
+					aria-label={tooltipLabel}
+					variant="glass"
+					size="lg"
+					className="w-[2.2rem] h-[2.2rem] border-transparent text-muted-foreground shadow-none hover:text-foreground"
+					style={{
+						minHeight: 'auto',
+						minWidth: 'auto'
+					}}
+					onBlur={() => setIsTooltipOpen(false)}
+					onClick={onToggle}
+					onFocus={() => {
+						updateTooltipPosition()
+						setIsTooltipOpen(true)
+					}}
+					onMouseEnter={() => {
+						updateTooltipPosition()
+						setIsTooltipOpen(true)
+					}}
+					onMouseLeave={() => setIsTooltipOpen(false)}
+				>
+					{isMobile ? (
+						<X
+							aria-hidden="true"
+							color="white"
+						/>
+					) : (
+						<PanelLeftClose
+							aria-hidden="true"
+							className={expanded ? '' : 'rotate-180'}
+						/>
+					)}
+				</IconButton> */}
 					<IconButton
 						aria-label="Fechar login"
 						variant="glass"
-						size="sm"
-						className="border-transparent text-muted-foreground shadow-none hover:text-white"
+						size="md"
+						className="w-[2.4rem] h-[2.4rem] border-transparent text-muted-foreground shadow-none hover:text-white"
+						style={{
+							minHeight: 'auto',
+							minWidth: 'auto'
+						}}
 						onClick={onClose}
 					>
-						<X aria-hidden="true" />
+						<X aria-hidden="true" color="white" />
 					</IconButton>
 				</div>
 				<Button
@@ -125,7 +164,8 @@ function LoginModal({
 					Google
 				</Button>
 			</div>
-		</div>
+		</div>,
+		document.body,
 	)
 }
 

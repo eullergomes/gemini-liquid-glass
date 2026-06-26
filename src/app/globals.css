@@ -77,7 +77,7 @@
 	--shadow-glass: var(--glass-shadow);
 	--shadow-glass-soft: var(--glass-shadow-soft);
 	--shadow-glass-focus: var(--glass-shadow-focus);
-	--font-sans: Arial, Helvetica, sans-serif;
+	--font-sans: var(--font-google-sans-flex), Arial, Helvetica, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

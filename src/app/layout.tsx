@@ -10,6 +10,8 @@ const googleSansFlex = Google_Sans_Flex({
 	weight: ['300', '400', '500', '600', '700', '800'],
 	style: 'normal',
 	display: 'swap',
+	variable: '--font-google-sans-flex',
+	adjustFontFallback: false,
 })
 
 export const metadata: Metadata = {
@@ -30,7 +32,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang="pt-BR"
-			className={`${googleSansFlex.className} h-full antialiased`}
+			className={`${googleSansFlex.variable} h-full antialiased`}
 		>
 			<body className="flex min-h-full flex-col">
 				<GlassFilters />

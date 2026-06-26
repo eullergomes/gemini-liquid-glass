@@ -314,7 +314,7 @@ function RecentItem({
 		<div
 			data-slot="recent-item"
 			data-active={active ? '' : undefined}
-			className="sidebar-liquid-button glass-list-item group relative focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
+			className="sidebar-liquid-button glass-list-item group relative focus-within:outline-none focus-within:ring-2 focus-within:ring-[#202b36] focus-within:ring-offset-background focus-visible:outline-none"
 		>
 			<button
 				type="button"

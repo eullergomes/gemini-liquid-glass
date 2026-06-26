@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronDown, Mic, Plus, SendHorizontal } from 'lucide-react'
-import { useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type KeyboardEvent } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { IconButton } from '@/components/ui/icon-button'
 import { Textarea } from '@/components/ui/textarea'
@@ -27,6 +27,10 @@ export function ChatComposer({
 	const canSubmit = message.trim().length > 0 && !disabled
 	const isHero = placement === 'hero'
 	const hasMessage = message.length > 0
+	const textareaStyle = {
+		fontSize: 'clamp(1rem, 1rem + 0.45vw, 1.1rem)',
+		...(hasMessage ? { flex: '0 0 100%', order: 1, width: '100%' } : {}),
+	} satisfies CSSProperties
 
 	useLayoutEffect(() => {
 		const textarea = textareaRef.current
@@ -87,7 +91,7 @@ export function ChatComposer({
 					'glass-elevated glass-refract-soft glass-inner-glow pointer-events-auto mx-auto flex min-h-[4.75rem] w-full max-w-[21.25rem] border-white/10 bg-[#202124]/90 shadow-[0_18px_70px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition-all duration-300 desktop:min-h-[4.5rem] desktop:max-w-[51.5rem]',
 					hasMessage
 						? 'flex-wrap content-start items-end gap-x-2 gap-y-2 rounded-[1.875rem] px-4 py-4 desktop:px-5 desktop:py-4'
-						: 'items-center gap-2 rounded-[2.375rem] px-5 py-4 desktop:px-6 desktop:py-3',
+						: 'items-center gap-2 rounded-[2.375rem] px-5 py-0 desktop:px-6 desktop:py-3',
 				)}
 				onSubmit={handleSubmit}
 			>
@@ -121,10 +125,10 @@ export function ChatComposer({
 					value={message}
 					data-scrollable={isTextareaScrollable ? '' : undefined}
 					className={twMerge(
-						'max-h-[12rem] min-h-12 min-w-0 flex-1 resize-none overflow-y-hidden border-0 bg-transparent text-xl font-medium leading-6 text-foreground shadow-none outline-none ring-0 placeholder:text-foreground-subtle focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:bg-transparent focus-visible:outline-none data-[scrollable]:overflow-y-auto desktop:max-h-[11.25rem] desktop:text-lg',
+						'max-h-[12rem] min-h-12 min-w-0 flex-1 resize-none overflow-y-hidden border-0 bg-transparent font-medium text-foreground shadow-none outline-none ring-0 placeholder:text-foreground-subtle focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:bg-transparent focus-visible:outline-none data-[scrollable]:overflow-y-auto desktop:max-h-[11.25rem]',
 						hasMessage ? 'order-1 w-full flex-none basis-full px-2 py-1' : 'px-1 py-3',
 					)}
-					style={hasMessage ? { flex: '0 0 100%', order: 1, width: '100%' } : undefined}
+					style={textareaStyle}
 					disabled={disabled}
 					onChange={(event) => setMessage(event.target.value)}
 					onKeyDown={handleKeyDown}

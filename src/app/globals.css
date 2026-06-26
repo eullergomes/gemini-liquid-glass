@@ -641,7 +641,18 @@ a {
 		border-color: transparent !important;
 		background: transparent !important;
 		box-shadow: none !important;
+		font-size: 1.375rem;
+		line-height: 1.75rem;
 		outline: none !important;
+	}
+
+	@media (min-width: 60rem) {
+		[data-slot="chat-composer"] [data-slot="textarea"],
+		[data-slot="chat-composer"] [data-slot="textarea"]:focus,
+		[data-slot="chat-composer"] [data-slot="textarea"]:focus-visible {
+			font-size: 1.5rem;
+			line-height: 2rem;
+		}
 	}
 
 	@media (pointer: coarse) {

@@ -333,8 +333,11 @@ function RecentItem({
 					aria-expanded={isMenuOpen}
 					aria-haspopup="menu"
 					variant="glass"
-					// size="sm"
-					className="w-[2.2rem] h-[2.2rem] min-w-auto min-h-auto border-transparent text-muted-foreground opacity-100 shadow-none hover:text-foreground desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-focus-within:opacity-100 data-[open]:opacity-100"
+					className="w-[2.2rem] h-[2.2rem] border-transparent text-muted-foreground opacity-100 shadow-none hover:text-foreground desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-focus-within:opacity-100 data-[open]:opacity-100"
+					style={{
+						minHeight: 'auto',
+						minWidth: 'auto'
+					}}
 					data-open={isMenuOpen ? '' : undefined}
 					onClick={(event) => {
 						event.stopPropagation()
@@ -447,7 +450,11 @@ function SidebarHeader({
 					aria-label={tooltipLabel}
 					variant="glass"
 					size="lg"
-					className="border-transparent text-muted-foreground shadow-none hover:text-foreground"
+					className="w-[2.2rem] h-[2.2rem] border-transparent text-muted-foreground shadow-none hover:text-foreground"
+					style={{
+						minHeight: 'auto',
+						minWidth: 'auto'
+					}}
 					onBlur={() => setIsTooltipOpen(false)}
 					onClick={onToggle}
 					onFocus={() => {

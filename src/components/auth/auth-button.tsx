@@ -99,7 +99,7 @@ function LoginModal({
 						</h2>
 						<p
 							id={descriptionId}
-							className="mt-2 text-sm leading-6 text-foreground-subtle"
+							className="mt-2 text-[16px] leading-6 text-foreground-subtle"
 						>
 							Conecte-se usando sua conta do Google.
 						</p>

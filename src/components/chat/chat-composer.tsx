@@ -84,7 +84,7 @@ export function ChatComposer({
 				data-filled={hasMessage ? '' : undefined}
 				data-scrollable={isTextareaScrollable ? '' : undefined}
 				className={twMerge(
-					'glass-elevated glass-refract-soft glass-inner-glow pointer-events-auto mx-auto flex min-h-[4.75rem] w-full max-w-[21.25rem] border-white/10 bg-[#202124]/90 shadow-[0_18px_70px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition-all duration-300 focus-within:-translate-y-0.5 focus-within:shadow-glass-focus desktop:min-h-[4.5rem] desktop:max-w-[51.5rem]',
+					'glass-elevated glass-refract-soft glass-inner-glow pointer-events-auto mx-auto flex min-h-[4.75rem] w-full max-w-[21.25rem] border-white/10 bg-[#202124]/90 shadow-[0_18px_70px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition-all duration-300 desktop:min-h-[4.5rem] desktop:max-w-[51.5rem]',
 					hasMessage
 						? 'flex-wrap content-start items-end gap-x-2 gap-y-2 rounded-[1.875rem] px-4 py-4 desktop:px-5 desktop:py-4'
 						: 'items-center gap-2 rounded-[2.375rem] px-5 py-4 desktop:px-6 desktop:py-3',
@@ -152,7 +152,7 @@ export function ChatComposer({
 					type={canSubmit ? 'submit' : 'button'}
 					style={hasMessage ? { order: 3 } : undefined}
 					className={twMerge(
-						canSubmit ? 'absolute right-3 size-11 shadow-glass-soft [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5' : 'size-11 border-transparent text-foreground-subtle shadow-none hover:text-foreground [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5',
+						canSubmit ? 'absolute right-3 size-11 shadow-glass-soft [&_svg]:size-5 desktop:size-10 desktop:[&_svg]:size-5' : 'size-11 border-transparent text-foreground-subtle shadow-none hover:text-foreground [&_svg]:size-5 desktop:size-12 desktop:[&_svg]:size-5',
 						hasMessage ? 'order-3' : '',
 						hasMessage && !isHero ? 'ml-auto' : '',
 					)}

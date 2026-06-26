@@ -644,15 +644,6 @@ a {
 		outline: none !important;
 	}
 
-	[data-slot="chat-composer"]:focus-within {
-		border-color: color-mix(in oklch, var(--ring) 58%, white 14%);
-		box-shadow:
-			0 0 0 1px color-mix(in oklch, var(--ring) 56%, transparent),
-			0 0 0 5px var(--glass-focus-ring),
-			inset 0 1px 0 oklch(100% 0 0 / 24%),
-			var(--glass-shadow-focus);
-	}
-
 	@media (pointer: coarse) {
 		[data-slot="button"],
 		[data-slot="icon-button"],

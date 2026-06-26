@@ -62,6 +62,28 @@ const focusableSelector = [
 	'[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
+function getRecentMenuPosition(anchor: HTMLElement): MenuPosition {
+	const rect = anchor.getBoundingClientRect()
+	const menuWidth = 112
+	const viewportPadding = 8
+	const isDesktopViewport = window.matchMedia('(min-width: 60rem)').matches
+	const sidebarRect = anchor
+		.closest<HTMLElement>('[data-slot="sidebar"], [data-slot="desktop-sidebar"]')
+		?.getBoundingClientRect()
+	const mobileAnchorRight = sidebarRect?.right ?? rect.right
+	const preferredLeft = isDesktopViewport
+		? rect.right + 8
+		: mobileAnchorRight + 8
+	const nextLeft = preferredLeft + menuWidth + viewportPadding <= window.innerWidth
+		? preferredLeft
+		: Math.max(viewportPadding, window.innerWidth - menuWidth - viewportPadding)
+
+	return {
+		left: nextLeft,
+		top: rect.bottom + 6,
+	}
+}
+
 function SidebarButton({
 	active = false,
 	badge,
@@ -142,30 +164,13 @@ function RecentItem({
 		}
 
 		function updateMenuPosition() {
-			const rect = menuButtonRef.current?.getBoundingClientRect()
+			const menuButton = menuButtonRef.current
 
-			if (!rect) {
+			if (!menuButton) {
 				return
 			}
 
-			const menuWidth = 112
-			const viewportPadding = 8
-			const isDesktopViewport = window.matchMedia('(min-width: 60rem)').matches
-			const sidebarRect = menuButtonRef.current
-				?.closest<HTMLElement>('[data-slot="sidebar"], [data-slot="desktop-sidebar"]')
-				?.getBoundingClientRect()
-			const mobileAnchorRight = sidebarRect?.right ?? rect.right
-			const preferredLeft = isDesktopViewport
-				? rect.right + 8
-				: mobileAnchorRight + 8
-			const nextLeft = preferredLeft + menuWidth + viewportPadding <= window.innerWidth
-				? preferredLeft
-				: Math.max(viewportPadding, window.innerWidth - menuWidth - viewportPadding)
-
-			setMenuPosition({
-				left: nextLeft,
-				top: rect.bottom + 6,
-			})
+			setMenuPosition(getRecentMenuPosition(menuButton))
 		}
 
 		updateMenuPosition()
@@ -174,6 +179,7 @@ function RecentItem({
 			if (
 				event.target instanceof Node
 				&& !menuRef.current?.contains(event.target)
+				&& !menuButtonRef.current?.contains(event.target)
 			) {
 				setIsMenuOpen(false)
 			}
@@ -221,6 +227,7 @@ function RecentItem({
 				className="glass-elevated glass-inner-glow fixed z-[120] min-w-28 rounded-2xl border-white/10 bg-[#202124]/88 p-1.5 shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur-2xl"
 				style={{
 					left: menuPosition.left,
+					position: 'fixed',
 					top: menuPosition.top,
 				}}
 			>
@@ -326,12 +333,18 @@ function RecentItem({
 					aria-expanded={isMenuOpen}
 					aria-haspopup="menu"
 					variant="glass"
-					size="sm"
-					className="size-8 border-transparent text-muted-foreground opacity-100 shadow-none hover:text-foreground desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-focus-within:opacity-100 data-[open]:opacity-100"
+					// size="sm"
+					className="w-[2.2rem] h-[2.2rem] min-w-auto min-h-auto border-transparent text-muted-foreground opacity-100 shadow-none hover:text-foreground desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-focus-within:opacity-100 data-[open]:opacity-100"
 					data-open={isMenuOpen ? '' : undefined}
 					onClick={(event) => {
 						event.stopPropagation()
-						setIsMenuOpen((current) => !current)
+						if (isMenuOpen) {
+							setIsMenuOpen(false)
+							return
+						}
+
+						setMenuPosition(getRecentMenuPosition(event.currentTarget))
+						setIsMenuOpen(true)
 					}}
 				>
 					<MoreVertical aria-hidden="true" />
@@ -388,7 +401,7 @@ function SidebarHeader({
 		? createPortal(
 			<span
 				role="tooltip"
-				className="pointer-events-none fixed z-[140] -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-background/92 px-4 py-2 text-sm font-medium text-foreground opacity-100 shadow-[0_14px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl"
+				className="glass-surfacepointer-events-none fixed z-[140] -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-background/92 px-4 py-2 text-sm font-medium text-foreground opacity-100 shadow-[0_14px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl"
 				style={{
 					left: tooltipPosition.left,
 					top: tooltipPosition.top,
